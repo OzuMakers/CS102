@@ -70,25 +70,10 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
-		img = new Texture("initial_player.jpg");//
-		sprite = new Sprite(img);//
-		sprite.setPosition(-sprite.getWidth() / 2, -sprite.getHeight() / 2);//
+	//	img = new Texture("initial_player.jpg");//
+	//	sprite = new Sprite(img);//
+	//	sprite.setPosition(-sprite.getWidth() / 2, -sprite.getHeight() / 2);//
 		world = new World(new Vector2(0, -1f), true);
-		
-		//BODY STUFF
-		BodyDef bodyDef = new BodyDef();//
-		bodyDef.type = BodyDef.BodyType.DynamicBody;//
-		bodyDef.position.set((sprite.getX() + sprite.getWidth() / 2) / PIXELS_TO_METERS, (sprite.getY() + sprite.getHeight() / 2) / PIXELS_TO_METERS);//
-		body = world.createBody(bodyDef);//
-		PolygonShape shape = new PolygonShape();//
-		shape.setAsBox(sprite.getWidth() / 2 / PIXELS_TO_METERS, sprite.getHeight() / 2 / PIXELS_TO_METERS);//
-		FixtureDef fixtureDef = new FixtureDef();//
-		fixtureDef.shape = shape;//
-		fixtureDef.density = 0.1f;//
-		fixtureDef.restitution = 0.5f;//
-		body.createFixture(fixtureDef);//
-		shape.dispose();//
-		//BODY STUFF
 		
 		BodyDef bodyDef2 = new BodyDef();
 		bodyDef2.type = BodyDef.BodyType.StaticBody;
@@ -116,8 +101,10 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	    //background
 	    
 	    //DO INITILIZE WHEN STARTED 
+	    if (Gdx.input.isPeripheralAvailable( Peripheral.Accelerometer )){
 	    initazimuth = Gdx.input.getAzimuth();
 		initroll = Gdx.input.getRoll();
+		}
 	    	    
 	}
 	//BACKGROUND
@@ -157,10 +144,10 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		batch.begin();
 		renderBackground(batch,Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2); //BACKGROUND
 		
-		if (drawSprite) batch.draw(sprite, sprite.getX(), sprite.getY(), sprite.getOriginX(),
+	/*	if (drawSprite) batch.draw(sprite, sprite.getX(), sprite.getY(), sprite.getOriginX(),
 		sprite.getOriginY(),
 		sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.
-		getScaleY(), sprite.getRotation());
+		getScaleY(), sprite.getRotation()); */
 		
 		/*font.draw(batch,
 			"Restitution: " + body.getFixtureList().first().getRestitution(), -Gdx.graphics.getWidth() / 2,
@@ -192,10 +179,10 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		batch.begin();
 		renderBackground(batch,Gdx.graphics.getWidth(), Gdx.graphics.getHeight());//BACKGROUND
 		
-		if (drawSprite) batch.draw(sprite, sprite.getX(), sprite.getY(), sprite.getOriginX(),
+		/*if (drawSprite) batch.draw(sprite, sprite.getX(), sprite.getY(), sprite.getOriginX(),
 		sprite.getOriginY(),
 		sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.
-		getScaleY(), sprite.getRotation());
+		getScaleY(), sprite.getRotation()); */
 	
 		/*font.draw(batch,
 			"Restitution: " + body.getFixtureList().first().getRestitution(), -Gdx.graphics.getWidth() / 2,
@@ -235,7 +222,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	}@Override
 	public boolean keyUp(int keycode) {
 		
-	/*	if (keycode == Input.Keys.RIGHT) body.setLinearVelocity(1f, 0f);
+		if (keycode == Input.Keys.RIGHT) body.setLinearVelocity(1f, 0f);
 		if (keycode == Input.Keys.LEFT) body.setLinearVelocity(-1f, 0f);
 		if (keycode == Input.Keys.UP) body.applyForceToCenter(0f, 10f, true);
 		if (keycode == Input.Keys.DOWN) body.applyForceToCenter(0f, -10f, true);
@@ -255,7 +242,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		if (keycode == Input.Keys.PERIOD) {
 			body.getFixtureList().first().setRestitution(body.getFixtureList().first().getRestitution() + 0.1f);
 		}
-		if (keycode == Input.Keys.ESCAPE || keycode == Input.Keys.NUM_1) drawSprite = !drawSprite; */
+		if (keycode == Input.Keys.ESCAPE || keycode == Input.Keys.NUM_1) drawSprite = !drawSprite;
 		return false;
 	}@Override
 	public boolean keyTyped(char character) {
