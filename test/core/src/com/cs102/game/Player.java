@@ -52,10 +52,23 @@ public class Player extends DynamicObject{
 				if (localx<-6) localx=-6;
 				else if (localx>6) localx=6;
 				float localy=((-(Gdx.input.getRoll()-initroll))/10);
-				if (localy<-4.5) localy=-5;
-				else if (localy>4.5) localy=5;
+				if (localy<-4.5) localy=(float) -4.5;
+				else if (localy>4.5) localy=(float) 4.5;
 				body.setLinearVelocity(localx, localy);
 				}
+			else {
+				float x = this.getBody().getLinearVelocity().x;
+				float y = this.getBody().getLinearVelocity().y;
+				if (x>6) x=6;
+				else if (x<-6) x=-6;
+				if (y>4.5) y=(float) 4.5; 
+				if (y<-4.5) y=(float) -4.5; 
+				this.getBody().setLinearVelocity(x, y);
+			}
+	}
+	
+	Body getBody(){
+		return body;
 	}
 
 }

@@ -15,10 +15,10 @@ public class Object {
 		sprite.setPosition(-sprite.getWidth() / 2, -sprite.getHeight() / 2);
 	}
 	 
-	Object(String spr, float x, float y){
+	Object(String spr, float centerx, float centery){
 		img = new Texture(spr);
 		sprite = new Sprite(img);
-		sprite.setPosition(-sprite.getWidth() / 2, -sprite.getHeight() / 2);
+		sprite.setPosition((-sprite.getWidth() / 2)+centerx, (-sprite.getHeight() / 2)+centery);
 	}
 	 
 	 void SetImage(String spr){
