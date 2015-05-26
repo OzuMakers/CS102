@@ -1,5 +1,7 @@
 package com.cs102.game;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -36,6 +38,24 @@ public class Player extends DynamicObject{
 		fixtureDef.restitution = 0.5f;
 		body.createFixture(fixtureDef);
 		shape.dispose();
+	}
+
+	@Override
+	void Update(float torque ,float scale, float initazimuth, float initroll) {
+			body.applyTorque(torque, true);
+			this.GetSprite().setPosition((body.getPosition().x * scale) - this.GetSprite().
+			getWidth() / 2, (body.getPosition().y * scale) - this.GetSprite().getHeight() / 2);
+			this.GetSprite().setRotation((float) Math.toDegrees(body.getAngle()));
+			
+			if (Gdx.input.isPeripheralAvailable( Peripheral.Accelerometer )){
+				float localx=((Gdx.input.getAzimuth()-initazimuth)/10);
+				if (localx<-6) localx=-6;
+				else if (localx>6) localx=6;
+				float localy=((-(Gdx.input.getRoll()-initroll))/10);
+				if (localy<-4.5) localy=-5;
+				else if (localy>4.5) localy=5;
+				body.setLinearVelocity(localx, localy);
+				}
 	}
 
 }

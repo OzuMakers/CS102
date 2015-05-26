@@ -16,7 +16,7 @@ abstract public class DynamicObject extends Object{
 	DynamicObject(String str, float scale, float x, float y){
 		super(str, x, y);
 		bodyDef.type = BodyDef.BodyType.DynamicBody;//
-		bodyDef.position.set((this.GetSprite().getX() + this.GetSprite().getWidth() / 2) / scale, (this.GetSprite().getY() + this.GetSprite().getHeight() / 2) / scale);//
+		bodyDef.position.set(x / scale, y / scale);//
 		
 	}
 	
@@ -24,4 +24,5 @@ abstract public class DynamicObject extends Object{
 		return bodyDef;
 	}
 	
+	abstract void Update(float torque ,float scale, float initazimuth, float initroll);
 }

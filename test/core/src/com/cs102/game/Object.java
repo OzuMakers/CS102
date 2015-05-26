@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public abstract class Object {
+public class Object {
 	Sprite sprite;
 	Texture img;
 	
@@ -47,4 +47,8 @@ public abstract class Object {
 					sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.
 					getScaleY(), sprite.getRotation());		
 		}
+	
+	public void dispose(){
+		img.dispose();
+	}
 }

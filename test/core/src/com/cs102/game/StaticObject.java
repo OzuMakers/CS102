@@ -7,15 +7,15 @@ abstract public class StaticObject extends Object{
 	
 	StaticObject(String str, float scale){
 		super(str);
-		bodyDef.type = BodyDef.BodyType.StaticBody;//
-		bodyDef.position.set((this.GetSprite().getX() + this.GetSprite().getWidth() / 2) / scale, (this.GetSprite().getY() + this.GetSprite().getHeight() / 2) / scale);//
+		bodyDef.type = BodyDef.BodyType.StaticBody;
+		bodyDef.position.set((this.GetSprite().getX() + this.GetSprite().getWidth() / 2) / scale, (this.GetSprite().getY() + this.GetSprite().getHeight() / 2) / scale);
 		
 	}
 	
 	StaticObject(String str, float scale, float x, float y){
 		super(str, x, y);
-		bodyDef.type = BodyDef.BodyType.StaticBody;//
-		bodyDef.position.set((this.GetSprite().getX() + this.GetSprite().getWidth() / 2) / scale, (this.GetSprite().getY() + this.GetSprite().getHeight() / 2) / scale);//
+		bodyDef.type = BodyDef.BodyType.StaticBody;
+		bodyDef.position.set(0, 0);
 		
 	}
 	
