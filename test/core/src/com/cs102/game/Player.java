@@ -17,6 +17,7 @@ public class Player extends DynamicObject{
 	Player(World currentworld, String texturelocation, float scale){
 		super(texturelocation, scale);
 		body = currentworld.createBody(this.GetBodyDef());
+		body.setUserData(this);
 		PolygonShape shape = new PolygonShape();
 		shape.setAsBox(this.GetSprite().getWidth() / 2 / scale, this.GetSprite().getHeight() / 2 / scale);
 		FixtureDef fixtureDef = new FixtureDef();
@@ -30,6 +31,7 @@ public class Player extends DynamicObject{
 	Player(World currentworld, String texturelocation, float scale, float x, float y){
 		super(texturelocation, scale, x, y);
 		body = currentworld.createBody(this.GetBodyDef());
+		body.setUserData(this);
 		PolygonShape shape = new PolygonShape();
 		shape.setAsBox(this.GetSprite().getWidth() / 2 / scale, this.GetSprite().getHeight() / 2 / scale);
 		FixtureDef fixtureDef = new FixtureDef();

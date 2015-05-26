@@ -1,11 +1,5 @@
 /*Changelog:
- * 	Changelog Added
- * 	Platform Specific Code Added
- * 	Needs to be optimized by eliminating two batch on desktop
- * 	Changed initialization time from 0.3 to 0.5
- * 	Background added
- * 	Object creation by default creates at center additional x and y adjusted to libgdx coordinate system (middle point is (0,0))
- * 	Desktop controls added
+ * 	Added CollisionListener Class
  */
 
 		
@@ -76,6 +70,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	float initroll = 0;
 	boolean calibrated = false;
 	int platform=0;
+	static int control=0;
 	/* 0: Desktop
 	 * 1: Android
 	*/
@@ -90,7 +85,11 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		}
 		
 		batch = new SpriteBatch();
-		world = new World(new Vector2(0, 0), true);
+		//World Config B.
+				world = new World(new Vector2(0, 0), true);
+				CollisionListener collisionlistener = new CollisionListener();
+				world.setContactListener(collisionlistener);
+		//World Config E.
 		Gdx.input.setInputProcessor(this);
 		debugRenderer = new Box2DDebugRenderer();
 		font = new BitmapFont();
@@ -110,9 +109,10 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		//StaticObject E. - Note: Texture is not used but required to create since super parent needs it.
 		
 		//DynamicObject B.
-		player = new Player(world, "badlogic.jpg", 100);
+		player = new Player(world, "initial_player.jpg", 100);
 		player2 = new Player(world, "initial_player.jpg", 100, 100, 100);
 		//DynamicObject E.
+		
 		
 		//Initialize sensor values B.
 		float delay = (float) 0.5; // seconds
@@ -161,7 +161,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 			objectArray[0].Draw(batch);
 			player.Draw(batch);
 			player2.Draw(batch);
-			font.draw(batch,
+			if (control==1) font.draw(batch,
 					"Platform: "+platform, -Gdx.graphics.getWidth() / 2,
 				Gdx.graphics.getHeight() / 2);
 			batch.end();
@@ -171,7 +171,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 			objectArray[0].Draw(batch);
 			player.Draw(batch);
 			player2.Draw(batch);
-			font.draw(batch,
+			if (control==1) font.draw(batch,
 					"Platform: "+platform, -Gdx.graphics.getWidth() / 2,
 				Gdx.graphics.getHeight() / 2);
 			batch.end();	
