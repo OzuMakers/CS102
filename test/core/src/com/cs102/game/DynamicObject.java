@@ -3,7 +3,7 @@ package com.cs102.game;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
-abstract public class DynamicObject extends Object{
+abstract public class DynamicObject extends Object2{
 	BodyDef bodyDef = new BodyDef();
 	
 	DynamicObject(String str, float scale){

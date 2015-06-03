@@ -40,23 +40,31 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
+import com.cs102.game.ServerProgram;
 
 public class DFVR extends ApplicationAdapter implements InputProcessor {
+
+	private TextureAtlas atlas;
+	private Animation animation;
+	private float timePassed = 0;
+	
 	SpriteBatch batch;
 	World world;
 
 	LineWall[] wallArray = new LineWall[4];
-	Object[] objectArray = new Object[1];
-	Player player;
-	Player player2;
+	Object2[] objectArray = new Object2[1];
+	public static Player player;
+	public static Player opp;
     Box2DDebugRenderer debugRenderer;
     Matrix4 debugMatrix;
     
@@ -97,8 +105,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
 		//Object B.
-		objectArray[0] = new Object("background.png");
-//			renderBackground(batch,Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2); //BACKGROUND
+		objectArray[0] = new Object2("background.png");
 		//Object E.
 		
 		//StaticObject B.
@@ -109,8 +116,10 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		//StaticObject E. - Note: Texture is not used but required to create since super parent needs it.
 		
 		//DynamicObject B.
-		player = new Player(world, "initial_player.jpg", 100);
-		player2 = new Player(world, "initial_player.jpg", 100, 100, 100);
+		atlas = new TextureAtlas(Gdx.files.internal("fireballanim.atlas"));
+		player = new Player(world, "initial_player.jpg", 100, new Animation(1/10f, atlas.getRegions()), 0);
+		atlas = new TextureAtlas(Gdx.files.internal("iceballanim.atlas"));
+		opp = new Player(world, "initial_player.jpg", 100, new Animation(1/10f, atlas.getRegions()), 100, 100, 1);
 		//DynamicObject E.
 		
 		
@@ -128,6 +137,8 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		    }
 		}, delay);
 		//Initialize sensor values E.
+		(new Thread(new ServerProgram())).start();
+	//(new Thread(new ClientProgram())).start();
 		
 	}
 	
@@ -142,10 +153,10 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		//UPDATE PLAYER HERE, i may want do it 60 times in second (same as world step) to avoid over doing it.
 		if (calibrated) {
 		player.Update(0, 100, initazimuth, initroll);
-		player2.Update(0, 100, initazimuth, initroll);
+		opp.Update(0, 100, initazimuth, initroll);
 		} else if (platform == 0) {
 			player.Update(0, 100, 0, 0);
-			player2.Update(0, 100, 0, 0);
+			opp.Update(0, 100, 0, 0);
 			}
 		
 		Gdx.gl.glClearColor(1, 1, 1, 1);
@@ -153,37 +164,91 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		
 		batch.setProjectionMatrix(camera.combined);
 		
-		debugMatrix = batch.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS,
-                PIXELS_TO_METERS, 0);
+		debugMatrix = batch.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS,PIXELS_TO_METERS, 0);
 
 			if (platform==1) Gdx.gl.glViewport( 0,0,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight() );
 			batch.begin();
 			objectArray[0].Draw(batch);
-			player.Draw(batch);
-			player2.Draw(batch);
+			timePassed += Gdx.graphics.getDeltaTime();//YAY HERE
+			player.Draw(batch,timePassed);
+			opp.Draw(batch,timePassed, 10f, 10f);
 			if (control==1) font.draw(batch,
 					"Platform: "+platform, -Gdx.graphics.getWidth() / 2,
 				Gdx.graphics.getHeight() / 2);
+			
+			font.draw(batch,
+					"AZIMUTH: " + (Gdx.input.getAzimuth()), -Gdx.graphics.getWidth() / 4,
+				Gdx.graphics.getHeight() / 4-50);
+			font.draw(batch,
+					"Roll: " + (Gdx.input.getRoll()), -Gdx.graphics.getWidth() / 4-150,
+				Gdx.graphics.getHeight() / 4-150);
+			
+			font.draw(batch,
+					"AZIMUTH: " + (initazimuth), -Gdx.graphics.getWidth() / 4,
+				Gdx.graphics.getHeight() / 4);
+			font.draw(batch,
+					"Roll: " + (initroll), -Gdx.graphics.getWidth() / 4-150,
+				Gdx.graphics.getHeight() / 4+50);
+			
+			font.draw(batch,
+					"AZIMUTH INITED: " + (Gdx.input.getAzimuth()-initazimuth), -Gdx.graphics.getWidth() / 4,
+				Gdx.graphics.getHeight() / 4 +100);
+			font.draw(batch,
+					"Roll INITED: " + (-(Gdx.input.getRoll()-initroll)), -Gdx.graphics.getWidth() / 4-150,
+				Gdx.graphics.getHeight() / 4+125);
+			
 			batch.end();
 			
 			if (platform==1) Gdx.gl.glViewport( Gdx.graphics.getWidth()/2,0,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight() );
 			batch.begin();
 			objectArray[0].Draw(batch);
-			player.Draw(batch);
-			player2.Draw(batch);
+			timePassed += Gdx.graphics.getDeltaTime();//YAY HERE
+			//+5 X AND +5 Y FOR 3D EFFECT
+			player.Draw(batch,timePassed, 5f, 5f);
+			opp.Draw(batch,timePassed, 15f, 15f);
 			if (control==1) font.draw(batch,
 					"Platform: "+platform, -Gdx.graphics.getWidth() / 2,
 				Gdx.graphics.getHeight() / 2);
+			
+			font.draw(batch,
+					"AZIMUTH: " + (Gdx.input.getAzimuth()), -Gdx.graphics.getWidth() / 4,
+				Gdx.graphics.getHeight() / 4-50);
+			font.draw(batch,
+					"Roll: " + (Gdx.input.getRoll()), -Gdx.graphics.getWidth() / 4-150,
+				Gdx.graphics.getHeight() / 4-150);
+			
+			font.draw(batch,
+					"AZIMUTH: " + (initazimuth), -Gdx.graphics.getWidth() / 4,
+				Gdx.graphics.getHeight() / 4);
+			font.draw(batch,
+					"Roll: " + (initroll), -Gdx.graphics.getWidth() / 4-150,
+				Gdx.graphics.getHeight() / 4+50);
+			
+			font.draw(batch,
+					"AZIMUTH INITED: " + (Gdx.input.getAzimuth()-initazimuth), -Gdx.graphics.getWidth() / 4,
+				Gdx.graphics.getHeight() / 4 +100);
+			font.draw(batch,
+					"Roll INITED: " + (-(Gdx.input.getRoll()-initroll)), -Gdx.graphics.getWidth() / 4-150,
+				Gdx.graphics.getHeight() / 4+125);
+			
+			
+			
+			// -45 - +45 roll aralýðý , roll orta kýsmý 0 
+			// 0 ila -180 aralýðý ROLL(REAL)
+			// 0 ÝLA 180 AZIMUTH (REAL)
+//			azimut -100 +50 aralýðý
+//			
+			
 			batch.end();	
 		
-		debugRenderer.render(world, debugMatrix);
+	//	debugRenderer.render(world, debugMatrix);
 		
 	}
 
 	@Override
 	public void dispose() {
 		player.dispose();
-		player2.dispose();
+		opp.dispose();
 		world.dispose();
 	}
 	

@@ -5,17 +5,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Object {
+public class Object2 {
 	Sprite sprite;
 	Texture img;
 	
-	Object(String spr){
+	Object2(String spr){
 		img = new Texture(spr);
 		sprite = new Sprite(img);
 		sprite.setPosition(-sprite.getWidth() / 2, -sprite.getHeight() / 2);
 	}
 	 
-	Object(String spr, float centerx, float centery){
+	Object2(String spr, float centerx, float centery){
 		img = new Texture(spr);
 		sprite = new Sprite(img);
 		sprite.setPosition((-sprite.getWidth() / 2)+centerx, (-sprite.getHeight() / 2)+centery);
