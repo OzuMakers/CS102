@@ -1,5 +1,5 @@
 /*Changelog:
- * 	Added CollisionListener Class
+ * 	Added Networking
  */
 
 		
@@ -57,6 +57,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	private TextureAtlas atlas;
 	private Animation animation;
 	private float timePassed = 0;
+	private boolean isServer=false;
 	
 	SpriteBatch batch;
 	World world;
@@ -136,9 +137,9 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		    		}
 		    }
 		}, delay);
-		//Initialize sensor values E.
-		(new Thread(new ServerProgram())).start();
-	//(new Thread(new ClientProgram())).start();
+
+		if (isServer) (new Thread(new ServerProgram())).start();
+		else (new Thread(new ClientProgram())).start();
 		
 	}
 	
@@ -257,10 +258,18 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		return false;
 	}@Override
 	public boolean keyUp(int keycode) {
-		if (keycode == Input.Keys.RIGHT) player.getBody().setLinearVelocity(1f+player.getBody().getLinearVelocity().x, player.getBody().getLinearVelocity().y);
-		if (keycode == Input.Keys.LEFT) player.getBody().setLinearVelocity(-1f+player.getBody().getLinearVelocity().x, player.getBody().getLinearVelocity().y);
-		if (keycode == Input.Keys.UP) player.getBody().setLinearVelocity(player.getBody().getLinearVelocity().x, player.getBody().getLinearVelocity().y+1f);
-		if (keycode == Input.Keys.DOWN) player.getBody().setLinearVelocity(player.getBody().getLinearVelocity().x, player.getBody().getLinearVelocity().y-1f);
+		if (isServer){
+		if (keycode == Input.Keys.RIGHT) ServerProgram.SendRight();
+		if (keycode == Input.Keys.LEFT) ServerProgram.SendLeft();
+		if (keycode == Input.Keys.UP) ServerProgram.SendUp();
+		if (keycode == Input.Keys.DOWN) ServerProgram.SendDown();
+		}
+		else {
+			if (keycode == Input.Keys.RIGHT) ClientProgram.SendRight();
+		if (keycode == Input.Keys.LEFT)ClientProgram.SendLeft();
+		if (keycode == Input.Keys.UP) ClientProgram.SendUp();
+		if (keycode == Input.Keys.DOWN) ClientProgram.SendDown();
+		}
 		return true;
 	}
 	@Override

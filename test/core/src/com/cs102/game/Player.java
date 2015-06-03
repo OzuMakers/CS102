@@ -63,7 +63,7 @@ public class Player extends DynamicObject{
 			getWidth() / 2, (body.getPosition().y * scale) - this.GetSprite().getHeight() / 2);
 			this.GetSprite().setRotation((float) Math.toDegrees(body.getAngle()));
 			
-			if (Gdx.input.isPeripheralAvailable( Peripheral.Accelerometer )){
+			/*if (Gdx.input.isPeripheralAvailable( Peripheral.Accelerometer )){
 				float controlx=Gdx.input.getAzimuth();
 				float controly=Gdx.input.getRoll();
 				
@@ -86,7 +86,7 @@ public class Player extends DynamicObject{
 				if (y>4.5) y=(float) 4.5; 
 				if (y<-4.5) y=(float) -4.5; 
 				this.getBody().setLinearVelocity(x, y);
-			}
+			}*/
 	}
 	
 	Body getBody(){
