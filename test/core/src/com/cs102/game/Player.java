@@ -59,31 +59,6 @@ public class Player extends DynamicObject{
 			this.GetSprite().setPosition((body.getPosition().x * scale) - this.GetSprite().
 			getWidth() / 2, (body.getPosition().y * scale) - this.GetSprite().getHeight() / 2);
 			this.GetSprite().setRotation((float) Math.toDegrees(body.getAngle()));
-			
-			/*if (Gdx.input.isPeripheralAvailable( Peripheral.Accelerometer )){
-				float controlx=Gdx.input.getAzimuth();
-				float controly=Gdx.input.getRoll();
-				
-				float localx=(controlx-initazimuth);
-				
-				float localy=(initroll-controly);
-				
-				if (controlx>0 && controlx<180 && controly>-180 && controly<0)
-				body.setLinearVelocity(localx, localy);
-				else if (controly>-180 && controly<0)
-					body.setLinearVelocity(body.getLinearVelocity().x, localy);
-				else if (controlx>0 && controlx<180)
-					body.setLinearVelocity(localx,body.getLinearVelocity().y);
-				}
-			else {
-				float x = this.getBody().getLinearVelocity().x;
-				float y = this.getBody().getLinearVelocity().y;
-				if (x>6) x=6;
-				else if (x<-6) x=-6;
-				if (y>4.5) y=(float) 4.5; 
-				if (y<-4.5) y=(float) -4.5; 
-				this.getBody().setLinearVelocity(x, y);
-			}*/
 	}
 	
 	Body getBody(){
@@ -106,10 +81,37 @@ public class Player extends DynamicObject{
 		return body.getTransform().getPosition();
 	}
 	public void move(){
-		if (direction.equals("Up")) this.getBody().setLinearVelocity(this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y+0.1f);
-		else if (direction.equals("Down")) this.getBody().setLinearVelocity(this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y-0.1f);
-		else if (direction.equals("Right")) this.getBody().setLinearVelocity(0.1f+this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y);
-		else if (direction.equals("Left")) this.getBody().setLinearVelocity(-0.1f+this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y);
+		
+		if (Gdx.input.isPeripheralAvailable( Peripheral.Accelerometer )){
+		float controlx=Gdx.input.getAzimuth();
+		float controly=Gdx.input.getRoll();
+		if (DFVR.isServer) {
+			if ((controly>-180 && controly<-100) || (controly>90 && controly<180)) //YUKARI
+				DFVR.player.getBody().setLinearVelocity(DFVR.player.getBody().getLinearVelocity().x, DFVR.player.getBody().getLinearVelocity().y+0.1f);
+			else if ((controly>-80 && controly<0) || (controly>0 && controly<90)) //AÞAÐI
+				DFVR.player.getBody().setLinearVelocity(DFVR.player.getBody().getLinearVelocity().x, DFVR.player.getBody().getLinearVelocity().y-0.1f);
+			if ((controlx>-125 && controlx<45)) //saða
+				 DFVR.player.getBody().setLinearVelocity(0.1f+DFVR.player.getBody().getLinearVelocity().x, DFVR.player.getBody().getLinearVelocity().y);
+			else if (controlx>-145 && controly<45) //sol
+				DFVR.player.getBody().setLinearVelocity(-0.1f+DFVR.player.getBody().getLinearVelocity().x, DFVR.player.getBody().getLinearVelocity().y);
+		} else {
+			if ((controly>-180 && controly<-100) || (controly>90 && controly<180)) //YUKARI
+				 DFVR.opp.getBody().setLinearVelocity(DFVR.opp.getBody().getLinearVelocity().x, DFVR.opp.getBody().getLinearVelocity().y+0.1f);
+			else if ((controly>-80 && controly<0) || (controly>0 && controly<90)) //AÞAÐI
+				DFVR.opp.getBody().setLinearVelocity(DFVR.opp.getBody().getLinearVelocity().x, DFVR.opp.getBody().getLinearVelocity().y-0.1f);
+			if ((controlx>-125 && controlx<45)) //saða
+				 DFVR.opp.getBody().setLinearVelocity(0.1f+DFVR.opp.getBody().getLinearVelocity().x, DFVR.opp.getBody().getLinearVelocity().y);
+			else if (controlx>-145 && controly<45) //sol
+				DFVR.opp.getBody().setLinearVelocity(-0.1f+DFVR.opp.getBody().getLinearVelocity().x, DFVR.opp.getBody().getLinearVelocity().y);
+		}
+		
+		} else {
+			if (direction.equals("Up")) this.getBody().setLinearVelocity(this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y+0.1f);
+			else if (direction.equals("Down")) this.getBody().setLinearVelocity(this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y-0.1f);
+			else if (direction.equals("Right")) this.getBody().setLinearVelocity(0.1f+this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y);
+			else if (direction.equals("Left")) this.getBody().setLinearVelocity(-0.1f+this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y);
+		}
+	
 		if (this.getBody().getLinearVelocity().x>5f) this.getBody().setLinearVelocity(5f, this.getBody().getLinearVelocity().y);
 		if (this.getBody().getLinearVelocity().y>5f) this.getBody().setLinearVelocity(this.getBody().getLinearVelocity().x, 5f);
 	}

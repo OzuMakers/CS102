@@ -1,5 +1,5 @@
 /*Changelog:
- * 	[FIXED] Networking cause error on android
+ * 	[FIXED] VR sensor values calibrated.
  */
 
 		
@@ -57,7 +57,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	private TextureAtlas atlas;
 	private Animation animation;
 	private float timePassed = 0;
-	private boolean isServer=true;
+	public static boolean isServer=true;
 	public boolean gamestarted=false;
 	
 	SpriteBatch batch;
