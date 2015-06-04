@@ -1,5 +1,5 @@
 /*Changelog:
- * 	Added Networking
+ * 	[FIXED] Networking cause error on android
  */
 
 		
@@ -57,7 +57,8 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	private TextureAtlas atlas;
 	private Animation animation;
 	private float timePassed = 0;
-	private boolean isServer=false;
+	private boolean isServer=true;
+	public boolean gamestarted=false;
 	
 	SpriteBatch batch;
 	public  static World world;
@@ -136,9 +137,6 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		    		}
 		    }
 		}, delay);
-
-		if (isServer) (new Thread(new ServerProgram())).start();
-		else (new Thread(new ClientProgram())).start();
 		
 	}
 	
@@ -146,6 +144,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	
 	@Override
 	public void render() {
+		gamestarted=true;
 		
 		camera.update();
 		if (isServer){
@@ -165,6 +164,9 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		        ClientProgram.transfer2.removeValue(vec2, true);
 		    }
 		}
+		
+		if (isServer && !gamestarted) (new Thread(new ServerProgram())).start();
+		else if(!gamestarted) (new Thread(new ClientProgram())).start();
 		world.step(1f / 100f, 6, 2);
 		//UPDATE PLAYER HERE, i may want do it 60 times in second (same as world step) to avoid over doing it.
 		if (calibrated) {
@@ -284,7 +286,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		if (keycode == Input.Keys.LEFT)ClientProgram.SendLeft();
 		if (keycode == Input.Keys.UP) ClientProgram.SendUp();
 		if (keycode == Input.Keys.DOWN) ClientProgram.SendDown();
-		}
+		} 
 		return true;
 	}
 	@Override

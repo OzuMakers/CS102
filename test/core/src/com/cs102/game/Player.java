@@ -29,8 +29,6 @@ public class Player extends DynamicObject{
 		body.setUserData(this);
 		CircleShape cshape = new CircleShape();
 		cshape.setRadius((this.GetSprite().getWidth() / 2-15) / scale);
-		//PolygonShape shape = new PolygonShape();
-		//shape.setAsBox(this.GetSprite().getWidth() / 2 / scale, this.GetSprite().getHeight() / 2 / scale);
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = cshape;
 		fixtureDef.density = 0.1f;
@@ -45,8 +43,6 @@ public class Player extends DynamicObject{
 		animation = anim;
 		body = currentworld.createBody(this.GetBodyDef());
 		body.setUserData(this);
-	//	PolygonShape shape = new PolygonShape();
-		//shape.setAsBox(this.GetSprite().getWidth() / 2 / scale, this.GetSprite().getHeight() / 2 / scale);
 		CircleShape cshape = new CircleShape();
 		cshape.setRadius((this.GetSprite().getWidth() / 2-15) / scale);
 		FixtureDef fixtureDef = new FixtureDef();
