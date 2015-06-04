@@ -19,6 +19,7 @@ public class Player extends DynamicObject{
 	Body body;
 	Animation animation;
 	int ID;
+	public String direction="Up";
 	
 	Player(World currentworld, String texturelocation, float scale, Animation anim, int id){
 		super(texturelocation, scale);
@@ -67,9 +68,9 @@ public class Player extends DynamicObject{
 				float controlx=Gdx.input.getAzimuth();
 				float controly=Gdx.input.getRoll();
 				
-				float localx=(controlx-initazimuth)/5;
+				float localx=(controlx-initazimuth);
 				
-				float localy=(initroll-controly)/5;
+				float localy=(initroll-controly);
 				
 				if (controlx>0 && controlx<180 && controly>-180 && controly<0)
 				body.setLinearVelocity(localx, localy);
@@ -101,12 +102,23 @@ public class Player extends DynamicObject{
 		batch.draw(animation.getKeyFrame(deltat,true),sprite.getX()+x,sprite.getY()+y);
 	}
 	
-	public void setBodyLocation(float x, float y){
-		body.setTransform(x,y,body.getAngle());
+	public void setBodyLocation(Vector2 vec){
+		body.setTransform(vec,body.getAngle());
 	}
 	
 	public Vector2 getBodyVector2(){
 		return body.getTransform().getPosition();
+	}
+	public void move(){
+		if (direction.equals("Up")) this.getBody().setLinearVelocity(this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y+0.1f);
+		else if (direction.equals("Down")) this.getBody().setLinearVelocity(this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y-0.1f);
+		else if (direction.equals("Right")) this.getBody().setLinearVelocity(0.1f+this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y);
+		else if (direction.equals("Left")) this.getBody().setLinearVelocity(-0.1f+this.getBody().getLinearVelocity().x, this.getBody().getLinearVelocity().y);
+		if (this.getBody().getLinearVelocity().x>5f) this.getBody().setLinearVelocity(5f, this.getBody().getLinearVelocity().y);
+		if (this.getBody().getLinearVelocity().y>5f) this.getBody().setLinearVelocity(this.getBody().getLinearVelocity().x, 5f);
+	}
+	public void setMove(String s){
+		direction=s;
 	}
 
 }

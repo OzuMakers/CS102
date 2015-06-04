@@ -46,26 +46,17 @@ public class ServerProgram extends Listener implements Runnable{
 	public void received(Connection c, Object p){
 		//Is the received packet the same class as PacketMessage.class?
 		if(p instanceof Up){
-			//APPLY CHANGE ON CLIENT BODY
-			System.out.println("Up");
-			DFVR.opp.getBody().applyForceToCenter(0f,10f,true);
-			
+			DFVR.opp.setMove("Up");			
 		}
 		else if(p instanceof Down){
-			//APPLY CHANGE ON CLIENT BODY
-			System.out.println("Down");
-			DFVR.opp.getBody().applyForceToCenter(0f,-10f,true);
+			DFVR.opp.setMove("Down");		
 		}
 		else if(p instanceof Right){
-			//APPLY CHANGE ON CLIENT BODY
-			System.out.println("Right");
-			DFVR.opp.getBody().applyForceToCenter(10f,0f,true);
-		}
+			DFVR.opp.setMove("Right");
+			}
 		else if(p instanceof Left){
-			//APPLY CHANGE ON CLIENT BODY
-			System.out.println("Left");
-			DFVR.opp.getBody().applyForceToCenter(-10f,0f,true);
-		}
+			DFVR.opp.setMove("Left");
+			}
 	}
 	//This is run when a client has disconnected.
 	public void disconnected(Connection c){
@@ -116,26 +107,18 @@ public class ServerProgram extends Listener implements Runnable{
 	}
 	
 	public static void SendUp(){
-		Up pd = new Up();
-		server.sendToAllTCP(pd);
-		DFVR.player.getBody().applyForceToCenter(0f,10f,true);
+		DFVR.player.setMove("Up");
 	}
 
 	public static void SendDown(){
-		Down pd = new Down();
-		server.sendToAllTCP(pd);
-		DFVR.player.getBody().applyForceToCenter(0f,-10f,true);
+		DFVR.player.setMove("Down");
 	}
 	
 	public static void SendRight(){
-		Right pd = new Right();
-		server.sendToAllTCP(pd);
-		DFVR.player.getBody().applyForceToCenter(10f,0f,true);
+		DFVR.player.setMove("Right");
 	}
 	
 	public static void SendLeft(){
-		Left pd = new Left();
-		server.sendToAllTCP(pd);
-		DFVR.player.getBody().applyForceToCenter(-10f,0f,true);
+		DFVR.player.setMove("Left");
 	}
 }

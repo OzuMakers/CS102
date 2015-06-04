@@ -4,12 +4,18 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
+
 import com.cs102.networkpacks.*;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 
 public class ClientProgram extends Listener implements Runnable{
+	public static Array<Vector2> transfer1 = new Array<Vector2>();
+	public static Array<Vector2> transfer2= new Array<Vector2>();
 	public static boolean gameover=false;
 	
 	static Client client;
@@ -50,17 +56,12 @@ public class ClientProgram extends Listener implements Runnable{
 				
 				//This is here to stop the program from closing before we receive a message.
 				while(!gameover){
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 				}
 				
 				System.out.println("Client will now exit.");
 				System.exit(0);
 			}
+
 	
 	public void received(Connection c, Object p){
 		//Is the received packet the same class as PacketMessage.class?
@@ -68,59 +69,54 @@ public class ClientProgram extends Listener implements Runnable{
 			//Cast it, so we can access the message within.
 			NetworkPack packet = (NetworkPack) p;
 			//UPDATE EVERYTHING FOR CLIENT...
-			/*DFVR.player.setBodyLocation(packet.serverX, packet.serverY);
-			DFVR.opp.setBodyLocation(packet.clientX, packet.clientY);*/
-			System.out.println("received a message from the host:");
+			Vector2 a = new Vector2(packet.serverX, packet.serverY);
+			Vector2 b = new Vector2(packet.clientX, packet.clientY);
+			 transfer1.add(a);
+			 transfer2.add(b);			 
+			//DFVR.player.setBodyLocation(packet.serverX, packet.serverY);
+		//	DFVR.opp.setBodyLocation(packet.clientX, packet.clientY);
+			System.out.println(a.toString());
+			System.out.println("a: "+packet.serverX+" "+packet.serverY);
+			System.out.println(b.toString());
+			System.out.println("b: "+packet.clientX+" "+packet.clientY);
 		}
-		else if(p instanceof Up){
+	/*	else if(p instanceof Up){
 			//APPLY CHANGE ON CLIENT BODY
-			System.out.println("Up");
-			DFVR.player.getBody().applyForceToCenter(0f,10f,true);
+			DFVR.player.setMove("Up");
 			
 		}
 		else if(p instanceof Down){
 			//APPLY CHANGE ON CLIENT BODY
-			System.out.println("Down");
-			DFVR.player.getBody().applyForceToCenter(0f,-10f,true);
+			DFVR.player.setMove("Down");
 		}
 		else if(p instanceof Right){
 			//APPLY CHANGE ON CLIENT BODY
-			System.out.println("Right");
-			DFVR.player.getBody().applyForceToCenter(10f,0f,true);
+			DFVR.player.setMove("Right");
 		}
 		else if(p instanceof Left){
 			//APPLY CHANGE ON CLIENT BODY
-			System.out.println("Left");
-			DFVR.player.getBody().applyForceToCenter(-10f,0f,true);
-		}
+			DFVR.player.setMove("Left");
+		} */
 	}
 	
 	public static void SendUp(){
 		Up pd = new Up();
 		client.sendTCP(pd);
-		//DFVR.opp.getBody().setLinearVelocity(DFVR.opp.getBody().getLinearVelocity().x, DFVR.opp.getBody().getLinearVelocity().y+1f);
-		DFVR.opp.getBody().applyForceToCenter(0f,10f,true);
 	}
 
 	public static void SendDown(){
 		Down pd = new Down();
 		client.sendTCP(pd);
-		//DFVR.opp.getBody().setLinearVelocity(DFVR.opp.getBody().getLinearVelocity().x, DFVR.opp.getBody().getLinearVelocity().y-1f);
-		DFVR.opp.getBody().applyForceToCenter(0f,-10f,true);
 	}
 	
 	public static void SendRight(){
 		Right pd = new Right();
 		client.sendTCP(pd);
-		//DFVR.opp.getBody().setLinearVelocity(1f+DFVR.opp.getBody().getLinearVelocity().x, DFVR.opp.getBody().getLinearVelocity().y);
-		DFVR.opp.getBody().applyForceToCenter(10f,0f,true);
 	}
 	
 	public static void SendLeft(){
 		Left pd = new Left();
 		client.sendTCP(pd);
-		//DFVR.opp.getBody().setLinearVelocity(-1f+DFVR.opp.getBody().getLinearVelocity().x, DFVR.opp.getBody().getLinearVelocity().y);
-		DFVR.opp.getBody().applyForceToCenter(-10f,0f,true);
 	}
 	
 	/*static Network network = new Network();

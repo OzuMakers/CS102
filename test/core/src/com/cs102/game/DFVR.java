@@ -60,7 +60,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	private boolean isServer=false;
 	
 	SpriteBatch batch;
-	World world;
+	public  static World world;
 
 	LineWall[] wallArray = new LineWall[4];
 	Object2[] objectArray = new Object2[1];
@@ -74,7 +74,6 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	float torque = 0.0f;
 	
 	final float PIXELS_TO_METERS = 100f;
-	
 	float initazimuth = 0;
 	float initroll = 0;
 	boolean calibrated = false;
@@ -149,8 +148,24 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	public void render() {
 		
 		camera.update();
-		world.step(1f / 60f, 6, 2);
-		
+		if (isServer){
+			player.move();
+			opp.move();
+		}
+		if (!isServer){
+		 for(Vector2 vec2 : ClientProgram.transfer1) {
+				System.out.println("Transformed to ("+vec2.x+","+vec2.y+")");
+		        DFVR.player.setBodyLocation(vec2);
+		        ClientProgram.transfer1.removeValue(vec2, true);
+		    }
+		 
+		 for(Vector2 vec2 : ClientProgram.transfer2) {
+			 	System.out.println("Transformed to ("+vec2.x+","+vec2.y+")");
+		        DFVR.opp.setBodyLocation(vec2);
+		        ClientProgram.transfer2.removeValue(vec2, true);
+		    }
+		}
+		world.step(1f / 100f, 6, 2);
 		//UPDATE PLAYER HERE, i may want do it 60 times in second (same as world step) to avoid over doing it.
 		if (calibrated) {
 		player.Update(0, 100, initazimuth, initroll);
