@@ -20,7 +20,7 @@ public class ClientProgram extends Listener implements Runnable{
 	
 	static Client client;
 	
-	static String ip = "localhost";
+	static String ip = "192.168.1.40";
 	
 	static int tcpPort = 27960, udpPort = 27960;
 
