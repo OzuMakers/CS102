@@ -1,0 +1,33 @@
+
+fireballanim.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+fireball-4
+  rotate: false
+  xy: 1, 1
+  size: 87, 85
+  orig: 87, 85
+  offset: 0, 0
+  index: -1
+fireball-2
+  rotate: false
+  xy: 90, 11
+  size: 91, 75
+  orig: 91, 75
+  offset: 0, 0
+  index: -1
+fireball-3
+  rotate: false
+  xy: 183, 11
+  size: 80, 75
+  orig: 80, 75
+  offset: 0, 0
+  index: -1
+fireball-1
+  rotate: false
+  xy: 265, 5
+  size: 74, 81
+  orig: 74, 81
+  offset: 0, 0
+  index: -1

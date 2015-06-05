@@ -57,7 +57,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	private TextureAtlas atlas;
 	private Animation animation;
 	private float timePassed = 0;
-	public static boolean isServer=false;
+	public static boolean isServer=true;
 	public boolean gamestarted=false;
 	
 	SpriteBatch batch;
