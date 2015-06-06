@@ -1,5 +1,8 @@
 package com.cs102.game;
 
+import java.util.ArrayList;
+import java.util.Stack;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,6 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -20,6 +24,7 @@ public class Player extends DynamicObject{
 	Animation animation;
 	int ID;
 	public String direction="Up";
+	public Stack<Trace> contacts = new Stack<Trace>();
 	
 	Player(World currentworld, String texturelocation, float scale, Animation anim, int id){
 		super(texturelocation, scale);
@@ -67,10 +72,16 @@ public class Player extends DynamicObject{
 	
 	public void Draw(SpriteBatch batch, float deltat){
 		batch.draw(animation.getKeyFrame(deltat,true),sprite.getX(),sprite.getY());
+		for(int i = 0; i<contacts.size(); i++){
+			contacts.get(i).Draw(batch);
+		}
 	}
 	
 	public void Draw(SpriteBatch batch, float deltat, float x, float y){
 		batch.draw(animation.getKeyFrame(deltat,true),sprite.getX()+x,sprite.getY()+y);
+		for(int i = 0; i<contacts.size(); i++){
+			contacts.get(i).Draw(batch);
+		}
 	}
 	
 	public void setBodyLocation(Vector2 vec){
@@ -117,6 +128,17 @@ public class Player extends DynamicObject{
 	}
 	public void setMove(String s){
 		direction=s;
+	}
+	
+	void destroyBody(World currentworld)
+    {
+       currentworld.destroyBody(body);
+       body = null; // that way you lose the only reference to the body as you should - it has been destroyed
+    }
+	
+	void dropPoint(World currentworld, String texturelocation , float scale, float w, float h){
+		Trace trace = new Trace(currentworld, texturelocation, scale, this.getBodyVector2().x,this.getBodyVector2().y, w*2/scale,h*2/scale,this);
+		contacts.add(trace);
 	}
 
 }

@@ -80,6 +80,7 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 	boolean calibrated = false;
 	int platform=0;
 	static int control=0;
+	static boolean dropped=false;
 	/* 0: Desktop
 	 * 1: Android
 	*/
@@ -165,6 +166,22 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 		    }
 		}
 		
+		if (!dropped){
+			dropped=true;
+			player.dropPoint(world,"line_burn.png", 100, 50,50);
+			opp.dropPoint(world,"line_ice.png", 100, 50,50);
+			if (player.contacts.size()>50) {player.contacts.remove(0); world.destroyBody(player.contacts.get(0).getBody());}
+			if (opp.contacts.size()>50) {opp.contacts.remove(0);world.destroyBody(opp.contacts.get(0).getBody());}
+		float delay = (float) 0.03; // seconds
+
+		Timer.schedule(new Task(){
+		    @Override
+		    public void run() {
+		    	dropped=false;
+		    	
+		    }
+		}, delay);
+		}
 		if (isServer && !gamestarted) (new Thread(new ServerProgram())).start();
 		else if(!gamestarted) (new Thread(new ClientProgram())).start();
 		world.step(1f / 100f, 6, 2);
@@ -248,18 +265,9 @@ public class DFVR extends ApplicationAdapter implements InputProcessor {
 			font.draw(batch,
 					"Roll INITED: " + (-(Gdx.input.getRoll()-initroll)), -Gdx.graphics.getWidth() / 4-150,
 				Gdx.graphics.getHeight() / 4+125);
-			
-			
-			
-			// -45 - +45 roll aralýðý , roll orta kýsmý 0 
-			// 0 ila -180 aralýðý ROLL(REAL)
-			// 0 ÝLA 180 AZIMUTH (REAL)
-//			azimut -100 +50 aralýðý
-//			
-			
 			batch.end();	
 		
-	//	debugRenderer.render(world, debugMatrix);
+	debugRenderer.render(world, debugMatrix);
 		
 	}
 

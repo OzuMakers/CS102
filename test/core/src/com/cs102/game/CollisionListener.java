@@ -20,12 +20,16 @@ public class CollisionListener implements ContactListener{
 		        Fixture fb = contact.getFixtureB();
 
 		        if(fa == null || fb == null){ return ;}
-		        if (fa.getBody().getUserData() instanceof Player){
-		        	((Player) fa.getBody().getUserData()).dispose();
-		        }
-		        else if (fb.getBody().getUserData() instanceof Player){
+		       if (fa.getBody().getUserData() instanceof Trace && (fb.getBody().getUserData() instanceof Player)){
+		        	if (((Trace)fa.getBody().getUserData()).owner != fb.getBody().getUserData()) {
 		        	((Player) fb.getBody().getUserData()).dispose();
-		        }
+		        	System.out.println("Player disposed");
+		        	} }
+		        else if (fb.getBody().getUserData() instanceof Trace && (fa.getBody().getUserData() instanceof Player)){
+		        	if (((Trace)fb.getBody().getUserData()).owner != fa.getBody().getUserData()) {
+		        	((Player) fa.getBody().getUserData()).dispose();
+		        	System.out.println("Player disposed");
+		        	} }
 		    }
 		}
    
