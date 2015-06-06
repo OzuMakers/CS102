@@ -21,6 +21,8 @@ public class ServerProgram extends Listener implements Runnable{
 	public void connected(Connection c){
 		System.out.println("Received a connection from "+c.getRemoteAddressTCP().getHostString());
 		//Create a message packet.
+		DFVR.gamestate=2;
+		System.out.println("Game is started");
 		NetworkPack packetMessage = new NetworkPack();
 		//Assign the message text.
 		
@@ -33,11 +35,17 @@ public class ServerProgram extends Listener implements Runnable{
 	
 	public void sendPack(){
 		NetworkPack pM = new NetworkPack();
-		//UPDATE PACK HERE
-		pM.serverX=DFVR.player.getBodyVector2().x;
-		pM.serverY=DFVR.player.getBodyVector2().y;
-		pM.clientX=DFVR.opp.getBodyVector2().x;
-		pM.clientY=DFVR.opp.getBodyVector2().y;
+		
+		pM.setGamestate(DFVR.gamestate);
+		
+		pM.setServerX(DFVR.player.getBodyVector2().x);
+		pM.setServerY(DFVR.player.getBodyVector2().y);
+		pM.setClientX(DFVR.opp.getBodyVector2().x);
+		pM.setClientY(DFVR.opp.getBodyVector2().y);
+		
+		pM.setClientPoint(DFVR.clientPoint);
+		pM.setServerPoint(DFVR.serverPoint);
+		
 		server.sendToAllTCP(pM);
 	}
 	

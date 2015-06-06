@@ -53,7 +53,8 @@ public class ClientProgram extends Listener implements Runnable{
 				client.addListener(new ClientProgram());
 				
 				System.out.println("Connected! The client program is now waiting for a packet...\n");
-				
+				DFVR.gamestate=2;
+				System.out.println("Game is started");
 				//This is here to stop the program from closing before we receive a message.
 				while(!gameover){
 				}
@@ -66,37 +67,15 @@ public class ClientProgram extends Listener implements Runnable{
 	public void received(Connection c, Object p){
 		//Is the received packet the same class as PacketMessage.class?
 		if(p instanceof NetworkPack){
-			//Cast it, so we can access the message within.
 			NetworkPack packet = (NetworkPack) p;
-			//UPDATE EVERYTHING FOR CLIENT...
-			Vector2 a = new Vector2(packet.serverX, packet.serverY);
-			Vector2 b = new Vector2(packet.clientX, packet.clientY);
+			Vector2 a = new Vector2(packet.getServerX(), packet.getServerY());
+			Vector2 b = new Vector2(packet.getClientX(), packet.getClientY());
+			DFVR.gamestate=((NetworkPack) p).getGamestate();
+			DFVR.serverPoint=((NetworkPack) p).getServerPoint();
+			DFVR.clientPoint=((NetworkPack) p).getClientPoint();
 			 transfer1.add(a);
 			 transfer2.add(b);			 
-			//DFVR.player.setBodyLocation(packet.serverX, packet.serverY);
-		//	DFVR.opp.setBodyLocation(packet.clientX, packet.clientY);
-			System.out.println(a.toString());
-			System.out.println("a: "+packet.serverX+" "+packet.serverY);
-			System.out.println(b.toString());
-			System.out.println("b: "+packet.clientX+" "+packet.clientY);
 		}
-	/*	else if(p instanceof Up){
-			//APPLY CHANGE ON CLIENT BODY
-			DFVR.player.setMove("Up");
-			
-		}
-		else if(p instanceof Down){
-			//APPLY CHANGE ON CLIENT BODY
-			DFVR.player.setMove("Down");
-		}
-		else if(p instanceof Right){
-			//APPLY CHANGE ON CLIENT BODY
-			DFVR.player.setMove("Right");
-		}
-		else if(p instanceof Left){
-			//APPLY CHANGE ON CLIENT BODY
-			DFVR.player.setMove("Left");
-		} */
 	}
 	
 	public static void SendUp(){

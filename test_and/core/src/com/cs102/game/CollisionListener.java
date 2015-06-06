@@ -20,15 +20,27 @@ public class CollisionListener implements ContactListener{
 		        Fixture fb = contact.getFixtureB();
 
 		        if(fa == null || fb == null){ return ;}
+		        if (fa.getBody().getUserData() instanceof Player && (fb.getBody().getUserData() instanceof Player)){
+		        	DFVR.gamestate=6;
+		        	System.out.println("Tie!");
+		        }
 		       if (fa.getBody().getUserData() instanceof Trace && (fb.getBody().getUserData() instanceof Player)){
 		        	if (((Trace)fa.getBody().getUserData()).owner != fb.getBody().getUserData()) {
-		        	((Player) fb.getBody().getUserData()).dispose();
-		        	System.out.println("Player disposed");
+		        	if (((Player) fb.getBody().getUserData()).ID==0){ DFVR.gamestate=5;
+		        	System.out.println("Client WON");
+		        	DFVR.clientPoint+=1;}
+		        	else { DFVR.gamestate=4;
+		        	System.out.println("Server WON");
+		        	DFVR.serverPoint+=1;}
 		        	} }
 		        else if (fb.getBody().getUserData() instanceof Trace && (fa.getBody().getUserData() instanceof Player)){
 		        	if (((Trace)fb.getBody().getUserData()).owner != fa.getBody().getUserData()) {
-		        	((Player) fa.getBody().getUserData()).dispose();
-		        	System.out.println("Player disposed");
+		        		if (((Player) fb.getBody().getUserData()).ID==0){ DFVR.gamestate=5;
+			        	System.out.println("Client WON");
+			        	DFVR.clientPoint+=1;} else
+		        		{ DFVR.gamestate=4;
+			        	System.out.println("Server WON");
+			        	DFVR.serverPoint+=1;}
 		        	} }
 		    }
 		}

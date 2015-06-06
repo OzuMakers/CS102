@@ -72,14 +72,17 @@ public class DFVR extends Game implements InputProcessor {
 	public static Player opp;
     Box2DDebugRenderer debugRenderer;
     Matrix4 debugMatrix;
-    int gamestate=2;
-    /*
-     * Just started program: 0
-     * Waiting for client: 1
+    static int gamestate=-1;
+    public static int serverPoint=0;
+    public static int clientPoint=0;
+    /* Just Started: -1
+     * Server: 0
+     * Client: 1
      * Action: 2
      * Paused: 3
      * Server won: 4
      * Client won: 5
+     * Tie: 6
      */
     
 	OrthographicCamera camera;
@@ -151,12 +154,22 @@ public class DFVR extends Game implements InputProcessor {
 		    		}
 		    }
 		}, delay);
-		if (isServer && !gamestarted) {(new Thread(new ServerProgram())).start(); gamestarted=true;}
-		else if(!gamestarted) {(new Thread(new ClientProgram())).start(); gamestarted=true;}
 	}
 	
 	private float elapsed = 0;
 	
+	private void initializePlayers(){
+		DFVR.player.setBodyLocation(new Vector2(-1,1));
+		DFVR.opp.setBodyLocation(new Vector2(1,1));
+		
+		while(!player.contacts.isEmpty()){
+			world.destroyBody(((Trace)player.contacts.pop()).getBody());
+		}
+		
+		while(!opp.contacts.isEmpty()){
+			world.destroyBody(((Trace)opp.contacts.pop()).getBody());
+		}
+	}
 	private void updateMovement(){
 		if (isServer){
 			player.move();
@@ -177,8 +190,8 @@ public class DFVR extends Game implements InputProcessor {
 			dropped=true;
 			player.dropPoint(world,"line_burn.png", 100, 50,50);
 			opp.dropPoint(world,"line_ice.png", 100, 50,50);
-			if (player.contacts.size()>50) {player.contacts.remove(0); world.destroyBody(player.contacts.get(0).getBody());}
-			if (opp.contacts.size()>50) {opp.contacts.remove(0);world.destroyBody(opp.contacts.get(0).getBody());}
+			if (player.contacts.size()>50) {world.destroyBody(player.contacts.get(0).getBody()); player.contacts.remove(0);}
+			if (opp.contacts.size()>50) {world.destroyBody(opp.contacts.get(0).getBody()); opp.contacts.remove(0);}
 		float delay = (float) 0.03; // seconds
 
 		Timer.schedule(new Task(){
@@ -200,12 +213,17 @@ public class DFVR extends Game implements InputProcessor {
 	}
 	
 	private void clearScreen(){
-//		Gdx.gl.glClearColor(1, 1, 1, 1);
-			//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	}
 	
 	@Override
 	public void render() {
+		clearScreen();
+		if (gamestate==0 && !gamestarted) {(new Thread(new ServerProgram())).start(); gamestarted=true; gamestate=2;}
+		else if(gamestate==1 && !gamestarted) {(new Thread(new ClientProgram())).start(); gamestarted=true; gamestate=2;}
+		
+		if (gamestate==4 || gamestate==5 || gamestate==6){ initializePlayers(); gamestate=2;}
 		//Player Movements&Trace B.
 		if(gamestate==2)updateMovement(); //If inAction
 		//Player Movements&Trace E.
@@ -218,6 +236,7 @@ public class DFVR extends Game implements InputProcessor {
 
 			if (platform==1) Gdx.gl.glViewport( 0,0,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight() );
 			batch.begin();
+			renderHUDs();
 			if(gamestate==2){//If inAction
 				timePassed += Gdx.graphics.getDeltaTime();
 				renderAction(batch,timePassed);
@@ -226,6 +245,7 @@ public class DFVR extends Game implements InputProcessor {
 			
 			if (platform==1) Gdx.gl.glViewport( Gdx.graphics.getWidth()/2,0,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight() );
 			batch.begin();
+			renderHUDs();
 			if(gamestate==2){ //If inAction
 				timePassed += Gdx.graphics.getDeltaTime();
 				renderAction(batch,timePassed);
@@ -250,6 +270,12 @@ public class DFVR extends Game implements InputProcessor {
 	}
 	
 private void renderHUDs(){
+if (gamestate==3)	font.draw(batch,
+			"PAUSED", -Gdx.graphics.getWidth() / 4,
+		Gdx.graphics.getHeight() / 4-50);
+if (gamestate==-1)	font.draw(batch,
+		"Server: Press 'S' Client: Press 'C'", -Gdx.graphics.getWidth() / 4-150,
+		Gdx.graphics.getHeight() / 4+50);
 	/*if (control==1) font.draw(batch,
 	"Platform: "+platform, -Gdx.graphics.getWidth() / 2,
 Gdx.graphics.getHeight() / 2);
@@ -287,13 +313,18 @@ Gdx.graphics.getHeight() / 4+125);
 		if (keycode == Input.Keys.LEFT) ServerProgram.SendLeft();
 		if (keycode == Input.Keys.UP) ServerProgram.SendUp();
 		if (keycode == Input.Keys.DOWN) ServerProgram.SendDown();
-		if (keycode == Input.Keys.SPACE) {if (gamestate!=2) gamestate=2; else gamestate=1;}
+		if (keycode == Input.Keys.P) {if (gamestate>2) gamestate=2; else gamestate=3;}
+		if (keycode == Input.Keys.S) {if (gamestate==-1) gamestate=0;}
+		if (keycode == Input.Keys.C) {if (gamestate==-1) gamestate=1;}
 		}
 		else {
 			if (keycode == Input.Keys.RIGHT) ClientProgram.SendRight();
 		if (keycode == Input.Keys.LEFT)ClientProgram.SendLeft();
 		if (keycode == Input.Keys.UP) ClientProgram.SendUp();
 		if (keycode == Input.Keys.DOWN) ClientProgram.SendDown();
+		if (keycode == Input.Keys.P) {if (gamestate>2) gamestate=2; else gamestate=3;}
+		if (keycode == Input.Keys.S) {if (gamestate==-1) gamestate=0;}
+		if (keycode == Input.Keys.C) {if (gamestate==-1) gamestate=1;}
 		} 
 		return true;
 	}
