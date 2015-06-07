@@ -26,20 +26,8 @@ public class Player extends DynamicObject{
 	public String direction="Up";
 	public Stack<Trace> contacts = new Stack<Trace>();
 	
-	Player(World currentworld, String texturelocation, float scale, Animation anim, int id){
-		super(texturelocation, scale);
-		ID=id;
-		animation = anim;
-		body = currentworld.createBody(this.GetBodyDef());
-		body.setUserData(this);
-		CircleShape cshape = new CircleShape();
-		cshape.setRadius((this.GetSprite().getWidth() / 2-15) / scale);
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.shape = cshape;
-		fixtureDef.density = 0.1f;
-		fixtureDef.restitution = 0.5f;
-		body.createFixture(fixtureDef);
-		cshape.dispose();
+	public Stack<Trace> getStack(){
+		return contacts;
 	}
 	
 	Player(World currentworld, String texturelocation, float scale, Animation anim, float x, float y, int id){
@@ -49,7 +37,9 @@ public class Player extends DynamicObject{
 		body = currentworld.createBody(this.GetBodyDef());
 		body.setUserData(this);
 		CircleShape cshape = new CircleShape();
-		cshape.setRadius((this.GetSprite().getWidth() / 2-15) / scale);
+		
+		this.setSpriteSize(50, 50);
+		cshape.setRadius((this.GetSprite().getWidth() / 2) / scale);
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = cshape;
 		fixtureDef.density = 0.1f;
@@ -66,23 +56,38 @@ public class Player extends DynamicObject{
 			this.GetSprite().setRotation((float) Math.toDegrees(body.getAngle()));
 	}
 	
+	void getSmaller(float howmuchw, float howmuchh, float scale){
+		if (this.GetSprite().getWidth()<0 || this.GetSprite().getHeight()<0) {
+			if (this.ID==0) DFVR.gamestate=5; else DFVR.gamestate=4;}
+		if (DFVR.gamestate==2){
+		this.setSpriteSize(this.GetSprite().getWidth()-howmuchw, this.GetSprite().getHeight()-howmuchh);
+		CircleShape shape = (CircleShape) body.getFixtureList().get(0).getShape(); 
+		shape.setRadius((this.GetSprite().getWidth() / 2) / scale);}
+	}
+	
 	Body getBody(){
 		return body;
 	}
 	
 	public void Draw(SpriteBatch batch, float deltat){
-		batch.draw(animation.getKeyFrame(deltat,true),sprite.getX(),sprite.getY());
+		batch.draw(animation.getKeyFrame(deltat,true),body.getPosition().x*100-sprite.getWidth() / 2,body.getPosition().y*100-sprite.getHeight() / 2, sprite.getWidth(),sprite.getHeight());
+		/*	System.out.println("SpriteX"+sprite.getX() +"SpriteY:"+sprite.getY());
+		System.out.println("BodyX"+body.getPosition().x +"BodyY:"+body.getPosition().y);
+		System.out.println("MouseX: "+Gdx.input.getX()+ "MouseY: "+Gdx.input.getY()); */
 		for(int i = 0; i<contacts.size(); i++){
 			contacts.get(i).Draw(batch);
 		}
 	}
 	
-	public void Draw(SpriteBatch batch, float deltat, float x, float y){
-		batch.draw(animation.getKeyFrame(deltat,true),sprite.getX()+x,sprite.getY()+y);
+	/*public void Draw(SpriteBatch batch, float deltat, float x, float y){
+		batch.draw(animation.getKeyFrame(deltat,true),sprite.getX()+x,sprite.getY()+y,sprite.getWidth(),sprite.getHeight());
+		/*System.out.println("SpriteX"+sprite.getX() +"SpriteY:"+sprite.getY());
+		System.out.println("BodyX"+body.getPosition().x +"BodyY:"+body.getPosition().y);
+		System.out.println("MouseX: "+Gdx.input.getX()+ "MouseY: "+Gdx.input.getY());
 		for(int i = 0; i<contacts.size(); i++){
 			contacts.get(i).Draw(batch);
 		}
-	}
+	}*/
 	
 	public void setBodyLocation(Vector2 vec){
 		body.setTransform(vec,body.getAngle());

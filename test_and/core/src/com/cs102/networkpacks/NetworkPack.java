@@ -1,5 +1,9 @@
 package com.cs102.networkpacks;
 
+import java.util.Stack;
+
+import com.cs102.game.Trace;
+
 public class NetworkPack {
 private float serverX=0;
 private float serverY=0;
@@ -8,6 +12,24 @@ private float clientY=0;
 private int gamestate;
 private int serverPoint;
 private int clientPoint;
+private Stack<Trace> traceStackServer;
+private Stack<Trace> traceStackClient;
+
+public Stack<Trace> getStackServer(){
+	return traceStackServer;
+}
+
+public void setStackServer(Stack<Trace> tracePointer){
+	traceStackServer=tracePointer;
+}
+
+public Stack<Trace> getStackClient(){
+	return traceStackServer;
+}
+
+public void setStackClient(Stack<Trace> tracePointer){
+	traceStackServer=tracePointer;
+}
 
 public  float getServerX() {
 	return serverX;

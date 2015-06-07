@@ -8,8 +8,8 @@ import com.cs102.game.DFVR;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-	//	config.width=DFVR.WIDTH; // sets window width
-      //  config.height=DFVR.HEIGHT;  // sets window height
+		config.width=DFVR.WIDTH; // sets window width
+       config.height=DFVR.HEIGHT;  // sets window height
 		new LwjglApplication(new DFVR(), config);
 	}
 }

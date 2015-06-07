@@ -46,6 +46,8 @@ public class ServerProgram extends Listener implements Runnable{
 		pM.setClientPoint(DFVR.clientPoint);
 		pM.setServerPoint(DFVR.serverPoint);
 		
+		pM.setStackServer(DFVR.player.getStack());
+		pM.setStackServer(DFVR.player.getStack());
 		server.sendToAllTCP(pM);
 	}
 	

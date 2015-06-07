@@ -12,7 +12,7 @@ public class LineWall extends StaticObject{
 	Body bodyEdgeScreen;
 	
 	LineWall(World currentworld, String texturelocation, float scale, float x1, float y1, float x2, float y2){
-		super(texturelocation, scale);
+		super(texturelocation, scale,x1,x1);//DUMMY POSITION
 	        
 	        FixtureDef fixtureDef2 = new FixtureDef();
 	        EdgeShape edgeShape = new EdgeShape();

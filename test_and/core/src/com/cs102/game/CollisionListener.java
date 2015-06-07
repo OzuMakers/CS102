@@ -2,6 +2,8 @@ package com.cs102.game;
 
 import java.util.Stack;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -20,20 +22,23 @@ public class CollisionListener implements ContactListener{
 		        Fixture fb = contact.getFixtureB();
 
 		        if(fa == null || fb == null){ return ;}
-		        if (fa.getBody().getUserData() instanceof Player && (fb.getBody().getUserData() instanceof Player)){
+		        if (fa.getBody().getUserData() instanceof Player && (fb.getBody().getUserData() instanceof Player)&&  DFVR.gamestate==2){
+		        	Sound sound = Gdx.audio.newSound(Gdx.files.internal("Crash.wav"));
+		        	sound.play(1.0f);
 		        	DFVR.gamestate=6;
 		        	System.out.println("Tie!");
+		        	
 		        }
 		       if (fa.getBody().getUserData() instanceof Trace && (fb.getBody().getUserData() instanceof Player)){
-		        	if (((Trace)fa.getBody().getUserData()).owner != fb.getBody().getUserData()) {
+		        	if (((Trace)fa.getBody().getUserData()).owner != fb.getBody().getUserData()&&  DFVR.gamestate==2) {
 		        	if (((Player) fb.getBody().getUserData()).ID==0){ DFVR.gamestate=5;
-		        	System.out.println("Client WON");
-		        	DFVR.clientPoint+=1;}
+		        	System.out.println("ICEBALL WON");
+		        	Sound sound = Gdx.audio.newSound(Gdx.files.internal("FireBall.mp3"));
+		        	sound.play(1.0f);}
 		        	else { DFVR.gamestate=4;
-		        	System.out.println("Server WON");
-		        	DFVR.serverPoint+=1;}
+		        	System.out.println("Server WON");}
 		        	} }
-		        else if (fb.getBody().getUserData() instanceof Trace && (fa.getBody().getUserData() instanceof Player)){
+		        else if (fb.getBody().getUserData() instanceof Trace && (fa.getBody().getUserData() instanceof Player)&&  DFVR.gamestate==2){
 		        	if (((Trace)fb.getBody().getUserData()).owner != fa.getBody().getUserData()) {
 		        		if (((Player) fb.getBody().getUserData()).ID==0){ DFVR.gamestate=5;
 			        	System.out.println("Client WON");

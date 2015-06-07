@@ -1,6 +1,12 @@
 /*Changelog:
- * 
+ * [ADDED] Random Spawn
+ * [ADDED] SCORE HUDS
+ * [ADDED] SOUNDS
+ * [ADDED] Getting Smaller
  */
+
+//ADD LIMITED RESOURCE
+//COLLECT OR BE SMALLER
 
 		
 			/*font.draw(batch,
@@ -30,6 +36,8 @@
 
 package com.cs102.game;
 
+import java.util.Random;
+
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
@@ -37,6 +45,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -75,6 +84,8 @@ public class DFVR extends Game implements InputProcessor {
     static int gamestate=-1;
     public static int serverPoint=0;
     public static int clientPoint=0;
+    public static final float playerW=100;
+    public static final float playerH=100;
     /* Just Started: -1
      * Server: 0
      * Client: 1
@@ -83,6 +94,12 @@ public class DFVR extends Game implements InputProcessor {
      * Server won: 4
      * Client won: 5
      * Tie: 6
+     * GameOVER Server Won: 7
+     * GameOVER Client Won: 8
+     */
+    /*
+     * ServerPlayer ID: 0
+     * ClientPlayer ID: 1
      */
     
 	OrthographicCamera camera;
@@ -90,19 +107,25 @@ public class DFVR extends Game implements InputProcessor {
 	float torque = 0.0f;
 	
 	final float PIXELS_TO_METERS = 100f;
+	public static int WIDTH = 750;
+	public static int HEIGHT = 500;
 	float initazimuth = 0;
 	float initroll = 0;
 	boolean calibrated = false;
 	int platform=0;
 	static int control=0;
 	static boolean dropped=false;
+	float scaledwidth = WIDTH/100;
+	float scaledheight = HEIGHT/100;
 	/* 0: Desktop
 	 * 1: Android
 	*/
 	
 	@Override
 	public void create() {
-		
+		Sound sound = Gdx.audio.newSound(Gdx.files.internal("Gamemusic.mp3"));
+		long id = sound.play(1.0f);
+		sound.setLooping(id, true);
 		if(Gdx.app.getType() == ApplicationType.Android) {
 		    platform=1;
 		}
@@ -123,7 +146,7 @@ public class DFVR extends Game implements InputProcessor {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
 		//Object B.
-		objectArray[0] = new Object2("background.png");
+		objectArray[0] = new Object2("background.png",0,0);
 		//Object E.
 		
 		//StaticObject B.
@@ -135,7 +158,7 @@ public class DFVR extends Game implements InputProcessor {
 		
 		//DynamicObject B.
 		atlas = new TextureAtlas(Gdx.files.internal("fireballanim.atlas"));
-		player = new Player(world, "initial_player.jpg", 100, new Animation(1/10f, atlas.getRegions()), 0);
+		player = new Player(world, "initial_player.jpg", 100, new Animation(1/10f, atlas.getRegions()), 0,0,0);
 		atlas = new TextureAtlas(Gdx.files.internal("iceballanim.atlas"));
 		opp = new Player(world, "initial_player.jpg", 100, new Animation(1/10f, atlas.getRegions()), 100, 100, 1);
 		//DynamicObject E.
@@ -154,13 +177,24 @@ public class DFVR extends Game implements InputProcessor {
 		    		}
 		    }
 		}, delay);
+		(new Thread(new Interrupt())).start();
 	}
 	
 	private float elapsed = 0;
 	
 	private void initializePlayers(){
-		DFVR.player.setBodyLocation(new Vector2(-1,1));
-		DFVR.opp.setBodyLocation(new Vector2(1,1));
+//		System.out.println(scaledwidth);
+	//	System.out.println(scaledheight);
+		float rand1 = new Random().nextFloat();
+		rand1 = rand1*(scaledwidth/2);
+		float rand2 = new Random().nextFloat();
+		rand2 = rand2*(scaledheight/2);
+		DFVR.player.setBodyLocation(new Vector2(rand1,rand2));
+		 rand1 = new Random().nextFloat();
+		rand1 = rand1*(scaledwidth/2);
+		rand2 = new Random().nextFloat();
+		rand2 = rand2*(scaledheight/2);
+		DFVR.opp.setBodyLocation(new Vector2(-rand1,-rand2));
 		
 		while(!player.contacts.isEmpty()){
 			world.destroyBody(((Trace)player.contacts.pop()).getBody());
@@ -169,6 +203,9 @@ public class DFVR extends Game implements InputProcessor {
 		while(!opp.contacts.isEmpty()){
 			world.destroyBody(((Trace)opp.contacts.pop()).getBody());
 		}
+		
+		player.setSpriteSize(DFVR.playerW,DFVR.playerH);
+		opp.setSpriteSize(DFVR.playerW,DFVR.playerH);
 	}
 	private void updateMovement(){
 		if (isServer){
@@ -222,8 +259,9 @@ public class DFVR extends Game implements InputProcessor {
 		clearScreen();
 		if (gamestate==0 && !gamestarted) {(new Thread(new ServerProgram())).start(); gamestarted=true; gamestate=2;}
 		else if(gamestate==1 && !gamestarted) {(new Thread(new ClientProgram())).start(); gamestarted=true; gamestate=2;}
-		
-		if (gamestate==4 || gamestate==5 || gamestate==6){ initializePlayers(); gamestate=2;}
+		if (gamestate==4){serverPoint+=1; initializePlayers(); gamestate=2;}
+		else if (gamestate==5){clientPoint+=1; initializePlayers(); gamestate=2;}
+		else if (gamestate==6){clientPoint-=1; serverPoint-=1; initializePlayers(); gamestate=2;}
 		//Player Movements&Trace B.
 		if(gamestate==2)updateMovement(); //If inAction
 		//Player Movements&Trace E.
@@ -236,11 +274,12 @@ public class DFVR extends Game implements InputProcessor {
 
 			if (platform==1) Gdx.gl.glViewport( 0,0,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight() );
 			batch.begin();
-			renderHUDs();
 			if(gamestate==2){//If inAction
 				timePassed += Gdx.graphics.getDeltaTime();
+			//	System.out.println(timePassed);
 				renderAction(batch,timePassed);
 			}
+			renderHUDs();
 			batch.end();
 			
 			if (platform==1) Gdx.gl.glViewport( Gdx.graphics.getWidth()/2,0,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight() );
@@ -250,9 +289,10 @@ public class DFVR extends Game implements InputProcessor {
 				timePassed += Gdx.graphics.getDeltaTime();
 				renderAction(batch,timePassed);
 			}
+			renderHUDs();
 			batch.end();	
 		
-	//debugRenderer.render(world, debugMatrix);
+	debugRenderer.render(world, debugMatrix);
 		
 	}
 
@@ -266,15 +306,18 @@ public class DFVR extends Game implements InputProcessor {
 	private void renderAction(SpriteBatch batch, float timePassed){
 		objectArray[0].Draw(batch); //RENDER BACKGROUND
 		player.Draw(batch,timePassed); //RENDER SERVER PLAYER
-		opp.Draw(batch,timePassed, 10f, 10f); //RENDER CLIENT PLAYER
+		opp.Draw(batch,timePassed); //RENDER CLIENT PLAYER
 	}
 	
 private void renderHUDs(){
+	font.draw(batch,
+			"Iceball: " + clientPoint + " Fireball: "+ serverPoint, -Gdx.graphics.getWidth() / 4-150,
+			Gdx.graphics.getHeight() / 4+50);
 if (gamestate==3)	font.draw(batch,
 			"PAUSED", -Gdx.graphics.getWidth() / 4,
 		Gdx.graphics.getHeight() / 4-50);
 if (gamestate==-1)	font.draw(batch,
-		"Server: Press 'S' Client: Press 'C'", -Gdx.graphics.getWidth() / 4-150,
+		"Server: Press 'V' Client: Press 'C'", -Gdx.graphics.getWidth() / 4-150,
 		Gdx.graphics.getHeight() / 4+50);
 	/*if (control==1) font.draw(batch,
 	"Platform: "+platform, -Gdx.graphics.getWidth() / 2,
@@ -313,8 +356,14 @@ Gdx.graphics.getHeight() / 4+125);
 		if (keycode == Input.Keys.LEFT) ServerProgram.SendLeft();
 		if (keycode == Input.Keys.UP) ServerProgram.SendUp();
 		if (keycode == Input.Keys.DOWN) ServerProgram.SendDown();
+		
+		if (keycode == Input.Keys.D) DFVR.opp.setMove("Right");	
+		if (keycode == Input.Keys.A) DFVR.opp.setMove("Left");	
+		if (keycode == Input.Keys.W) DFVR.opp.setMove("Up");	
+		if (keycode == Input.Keys.S) DFVR.opp.setMove("Down");	
+		
 		if (keycode == Input.Keys.P) {if (gamestate>2) gamestate=2; else gamestate=3;}
-		if (keycode == Input.Keys.S) {if (gamestate==-1) gamestate=0;}
+		if (keycode == Input.Keys.V) {if (gamestate==-1) gamestate=0;}
 		if (keycode == Input.Keys.C) {if (gamestate==-1) gamestate=1;}
 		}
 		else {
@@ -323,8 +372,14 @@ Gdx.graphics.getHeight() / 4+125);
 		if (keycode == Input.Keys.UP) ClientProgram.SendUp();
 		if (keycode == Input.Keys.DOWN) ClientProgram.SendDown();
 		if (keycode == Input.Keys.P) {if (gamestate>2) gamestate=2; else gamestate=3;}
-		if (keycode == Input.Keys.S) {if (gamestate==-1) gamestate=0;}
+		if (keycode == Input.Keys.V) {if (gamestate==-1) gamestate=0;}
 		if (keycode == Input.Keys.C) {if (gamestate==-1) gamestate=1;}
+		
+		if (keycode == Input.Keys.D) DFVR.opp.setMove("Right");	
+		if (keycode == Input.Keys.A) DFVR.opp.setMove("Left");	
+		if (keycode == Input.Keys.W) DFVR.opp.setMove("Up");	
+		if (keycode == Input.Keys.S) DFVR.opp.setMove("Down");	
+		
 		} 
 		return true;
 	}
