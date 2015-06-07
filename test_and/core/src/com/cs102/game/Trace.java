@@ -32,6 +32,7 @@ public class Trace extends StaticObject{
 	        bodyEdgeScreen = currentworld.createBody(this.GetBodyDef());
 	        bodyEdgeScreen.createFixture(fixtureDef2);
 	        bodyEdgeScreen.setTransform(x, y, 0);
+	        bodyEdgeScreen.setUserData(this);
 	        shape.dispose();
 	        this.owner = owner;
 	        bodyEdgeScreen.setUserData(this);

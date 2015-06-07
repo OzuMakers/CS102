@@ -1,92 +1,34 @@
 /*Changelog:
  *[ADDED] ICE WINNING SOUND
  *[FIXED] TRACE SIZE&LOCATION
+ *[FIXED] Memory Allocation
+ *[FIXED] LAGGING
  */
-/*NEXT:
+
+/*NEXT FEATURES
+ * Fix fireball score up when both guys dead
  * ARRANGING HUDS
+ * Fullscreen support
  */
-		
-			/*font.draw(batch,
-				"Restitution: " + body.getFixtureList().first().getRestitution(), -Gdx.graphics.getWidth() / 2,
-			Gdx.graphics.getHeight() / 2); */
-			
-			/*font.draw(batch,
-					"X: " + (Gdx.input.getAccelerometerX() -9.8), -Gdx.graphics.getWidth() / 4,
-				Gdx.graphics.getHeight() / 4);
-			font.draw(batch,
-					"Y: " + Gdx.input.getAccelerometerY(), -Gdx.graphics.getWidth() / 4+50,
-				Gdx.graphics.getHeight() / 4+50);
-			font.draw(batch,
-					"Z: " + Gdx.input.getAccelerometerZ(), -Gdx.graphics.getWidth() / 4+100,
-				Gdx.graphics.getHeight() / 4+100);
-			
-			font.draw(batch,
-					"AZIMUTH: " + Gdx.input.getAzimuth(), -Gdx.graphics.getWidth() / 4,
-				Gdx.graphics.getHeight() / 4-50);
-			font.draw(batch,
-					"Pitch: " + Gdx.input.getPitch(), -Gdx.graphics.getWidth() / 4-100,
-				Gdx.graphics.getHeight() / 4-100);
-			font.draw(batch,
-					"Roll: " + Gdx.input.getRoll(), -Gdx.graphics.getWidth() / 4-150,
-				Gdx.graphics.getHeight() / 4-150);*/
-	
 
-package com.cs102.game;
+/* GamePlay
+ * Head2Head Crush -1 Point for All
+ * Default ScoreGoal: 10 Point
+ * Default SizeGoal 300px
+ * Size lowers by time
+ * Collect mana to Size Up and 0.5 Point
+ * P key Pauses the game
+ * You gotta press to direct ball. Constant pressing is not allowed.
+ */
 
-import java.util.Random;
-import java.util.Stack;
+/*Notes
+ * 100f means float type 100
+ * Android side does not work currently
+ * Networking is working but ports needs to be opened.
+ */
 
-import com.badlogic.gdx.Application.ApplicationType;
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.Peripheral;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
-import com.cs102.game.ServerProgram;
-
-public class DFVR extends Game implements InputProcessor {
-
-	private TextureAtlas atlas;
-	private Animation animation;
-	private float timePassed = 0;
-	public static boolean isServer=true;
-	public boolean gamestarted=false;
-	private boolean stopRendering=false;
-	public final static float howmuchbiggerpx=50;
-	SpriteBatch batch;
-	public  static World world;
-	
-	public static Stack<Object2> WorldSensitiveActions = new Stack<Object2>();
-	
-	LineWall[] wallArray = new LineWall[4];
-	Object2[] objectArray = new Object2[1];
-	public static Player player;
-	public static Player opp;
-	public static MagicBolt magicbolt;
-    Box2DDebugRenderer debugRenderer;
-    Matrix4 debugMatrix;
-    static int gamestate=-1; //MUST BE -1
-    public static int serverPoint=0;
-    public static int clientPoint=0;
-    public static final float playerW=100;
-    public static final float playerH=100;
-    /* Just Started: -1
+/* Gamestate:
+ 	 * Just Started: -1
      * Server: 0
      * Client: 1
      * Action: 2
@@ -97,25 +39,79 @@ public class DFVR extends Game implements InputProcessor {
      * GameOVER Server Won: 7
      * GameOVER Client Won: 8
      */
-    /*
+    
+    /* Player ID:
      * ServerPlayer ID: 0
      * ClientPlayer ID: 1
      */
-    //Config B.
+	
+	/*  Platform:
+	 * 0: Desktop
+	 * 1: Android
+	*/
+
+package com.cs102.game;
+
+import java.util.Random;
+import java.util.Stack;
+
+import com.badlogic.gdx.Application.ApplicationType;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Peripheral;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
+import com.cs102.game.ServerProgram;
+
+public class DFVR extends Game implements InputProcessor {
+    //Game Config B.
+    public static final float playerW=100;
+    public static final float playerH=100;
     public static float goalsizepx=300;
     public static int diesizepx=30;
     public static int winningCriteria=10;
-  //Config E.
+    final float PIXELS_TO_METERS = 100f;
+    public static int WIDTH = 1000;
+	public static int HEIGHT = 700;
+	public final static float howmuchbiggerpx=50;
+	//Game Config E.
+	
+	//Game Variables B.
+    Box2DDebugRenderer debugRenderer;
+    Matrix4 debugMatrix;
     
-    boolean relocate=false;
-    
+    static int gamestate=-1; //MUST BE -1
+    public static float serverPoint=0;
+    public static float clientPoint=0;
+    SpriteBatch batch;
+	public  static World world;
+	public static Stack<Object2> WorldSensitiveActions = new Stack<Object2>();
+	LineWall[] wallArray = new LineWall[4];
+	Object2[] objectArray = new Object2[1];
+	public static Player player;
+	public static Player opp;
+	public static MagicBolt magicbolt;
+	private TextureAtlas atlas;
+	private float timePassed = 0;
+	public static boolean isServer=true;
+	public boolean gamestarted=false;
+	boolean relocate=false;
 	OrthographicCamera camera;
 	BitmapFont font;
 	float torque = 0.0f;
-	
-	final float PIXELS_TO_METERS = 100f;
-	public static int WIDTH = 750;
-	public static int HEIGHT = 500;
 	float initazimuth = 0;
 	float initroll = 0;
 	boolean calibrated = false;
@@ -124,9 +120,7 @@ public class DFVR extends Game implements InputProcessor {
 	static boolean dropped=false;
 	static float scaledwidth = WIDTH/100;
 	static float scaledheight = HEIGHT/100;
-	/* 0: Desktop
-	 * 1: Android
-	*/
+	//Game Variables E.
 	
 	@Override
 	public void create() {
@@ -189,12 +183,10 @@ public class DFVR extends Game implements InputProcessor {
 		}, delay);
 		(new Thread(new Interrupt())).start();
 	}
-	
+	//Initialize sensor values E.
 	private float elapsed = 0;
 	
 	private void initializePlayers(){
-//		System.out.println(scaledwidth);
-	//	System.out.println(scaledheight);
 		float rand1 = new Random().nextFloat();
 		rand1 = rand1*(scaledwidth/2);
 		float rand2 = new Random().nextFloat();
@@ -237,8 +229,8 @@ public class DFVR extends Game implements InputProcessor {
 			dropped=true;
 			player.dropPoint(world,"line_burn.png", 100, 50,50);
 			opp.dropPoint(world,"line_ice.png", 100, 50,50);
-			if (player.contacts.size()>30) {world.destroyBody(player.contacts.get(0).getBody()); player.contacts.remove(0);}
-			if (opp.contacts.size()>30) {world.destroyBody(opp.contacts.get(0).getBody()); opp.contacts.remove(0);}
+			if (player.contacts.size()>30) {((Trace)player.contacts.get(0).getBody().getUserData()).dispose(); world.destroyBody(player.contacts.get(0).getBody()); player.contacts.remove(0);}
+			if (opp.contacts.size()>30) {((Trace)player.contacts.get(0).getBody().getUserData()).dispose(); world.destroyBody(opp.contacts.get(0).getBody()); opp.contacts.remove(0);}
 		float delay = (float) 0.03; // seconds
 
 		Timer.schedule(new Task(){
@@ -323,6 +315,7 @@ public class DFVR extends Game implements InputProcessor {
 		player.dispose();
 		opp.dispose();
 		world.dispose();
+		magicbolt.dispose();
 	}
 	
 	private void renderAction(SpriteBatch batch, float timePassed){
@@ -338,40 +331,15 @@ private void renderHUDs(){
 			"Iceball: " + clientPoint + " Fireball: "+ serverPoint, -Gdx.graphics.getWidth()/2+5,
 			+Gdx.graphics.getHeight()/2-5);
 if (gamestate==7){font.setColor(Color.RED); font.draw(batch,
-		"FIREBALL WIN!", -60,0);font.setColor(Color.BLACK);}
+		"FIREBALL WIN! Press R to Restart", -100,0);font.setColor(Color.BLACK);}
 else if (gamestate==8){font.setColor(Color.BLUE); font.draw(batch,
-		"ICEBALL WIN!", -55,0);font.setColor(Color.BLACK);}
+		"ICEBALL WIN! Press R to Restart", -100,0);font.setColor(Color.BLACK);}
 else if (gamestate==3)	{font.draw(batch,
 			"PAUSED", -Gdx.graphics.getWidth() / 4,
 		Gdx.graphics.getHeight() / 4-50);}
 else if (gamestate==-1)	font.draw(batch,
 		"Server: Press 'V' Client: Press 'C'", -Gdx.graphics.getWidth() / 4-150,
 		Gdx.graphics.getHeight() / 4+75);
-	/*if (control==1) font.draw(batch,
-	"Platform: "+platform, -Gdx.graphics.getWidth() / 2,
-Gdx.graphics.getHeight() / 2);
-
-font.draw(batch,
-	"AZIMUTH: " + (Gdx.input.getAzimuth()), -Gdx.graphics.getWidth() / 4,
-Gdx.graphics.getHeight() / 4-50);
-font.draw(batch,
-	"Roll: " + (Gdx.input.getRoll()), -Gdx.graphics.getWidth() / 4-150,
-Gdx.graphics.getHeight() / 4-150);
-
-font.draw(batch,
-	"AZIMUTH: " + (initazimuth), -Gdx.graphics.getWidth() / 4,
-Gdx.graphics.getHeight() / 4);
-font.draw(batch,
-	"Roll: " + (initroll), -Gdx.graphics.getWidth() / 4-150,
-Gdx.graphics.getHeight() / 4+50);
-
-font.draw(batch,
-	"AZIMUTH INITED: " + (Gdx.input.getAzimuth()-initazimuth), -Gdx.graphics.getWidth() / 4,
-Gdx.graphics.getHeight() / 4 +100);
-font.draw(batch,
-	"Roll INITED: " + (-(Gdx.input.getRoll()-initroll)), -Gdx.graphics.getWidth() / 4-150,
-Gdx.graphics.getHeight() / 4+125);
-*/
 	}
 	
 	@Override
@@ -393,6 +361,7 @@ Gdx.graphics.getHeight() / 4+125);
 		if (keycode == Input.Keys.P) {if (gamestate>2) gamestate=2; else if(gamestate==2) gamestate=3;}
 		if (keycode == Input.Keys.V) {if (gamestate==-1) gamestate=0;}
 		if (keycode == Input.Keys.C) {if (gamestate==-1) gamestate=1;}
+		if (keycode == Input.Keys.R) {if (gamestate==7||gamestate==8) gamestate=2; serverPoint=0; clientPoint=0;}
 		}
 		else {
 			if (keycode == Input.Keys.RIGHT) ClientProgram.SendRight();
@@ -402,6 +371,7 @@ Gdx.graphics.getHeight() / 4+125);
 		if (keycode == Input.Keys.P) {if (gamestate>2) gamestate=2; else if(gamestate==2) gamestate=3;}
 		if (keycode == Input.Keys.V) {if (gamestate==-1) gamestate=0;}
 		if (keycode == Input.Keys.C) {if (gamestate==-1) gamestate=1;}
+		if (keycode == Input.Keys.R) {if (gamestate==7||gamestate==8) gamestate=2; serverPoint=0; clientPoint=0;}
 		
 		if (keycode == Input.Keys.D) DFVR.opp.setMove("Right");	
 		if (keycode == Input.Keys.A) DFVR.opp.setMove("Left");	
@@ -412,7 +382,7 @@ Gdx.graphics.getHeight() / 4+125);
 		return true;
 	}
 	@Override
-	public boolean keyTyped(char character) {
+	public boolean keyTyped(char c) {
 		return false;
 	}
 	@Override

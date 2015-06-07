@@ -48,11 +48,13 @@ public class CollisionListener implements ContactListener{
 		        else  if ((fa.getBody().getUserData() instanceof MagicBolt) && (fb.getBody().getUserData() instanceof Player)){
 		        	((MagicBolt)fb.getBody().getUserData()).addToSensitiveList();
 		        	((MagicBolt)fb.getBody().getUserData()).makeBigger(((Player)fa.getBody().getUserData()), DFVR.howmuchbiggerpx, DFVR.howmuchbiggerpx, 100);
+		        	((Player)fa.getBody().getUserData()).increaseScore((float)0.5);
 		        } 
 		        else  if ((fb.getBody().getUserData() instanceof MagicBolt) && (fa.getBody().getUserData() instanceof Player)){
 		        	((MagicBolt)fb.getBody().getUserData()).addToSensitiveList();
 		        	((MagicBolt)fb.getBody().getUserData()).makeBigger(((Player)fa.getBody().getUserData()), DFVR.howmuchbiggerpx, DFVR.howmuchbiggerpx, 100);
-		        	}
+		        	((Player)fa.getBody().getUserData()).increaseScore((float)0.5);
+		        }
 		        else  if ((fb.getBody().getUserData() instanceof LineWall) || (fa.getBody().getUserData() instanceof LineWall)){
 		        	Sound sound = Gdx.audio.newSound(Gdx.files.internal("ball_bounce.mp3"));
 		        	sound.play(2.0f);

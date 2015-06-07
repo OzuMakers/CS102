@@ -72,7 +72,7 @@ public class Player extends DynamicObject{
 		/*	System.out.println("SpriteX"+sprite.getX() +"SpriteY:"+sprite.getY());
 		System.out.println("BodyX"+body.getPosition().x +"BodyY:"+body.getPosition().y);
 		System.out.println("MouseX: "+Gdx.input.getX()+ "MouseY: "+Gdx.input.getY()); */
-		for(int i = 0; i<contacts.size(); i++){
+		for(int i = 1; i<contacts.size(); i++){
 			contacts.get(i).Draw(batch);
 		}
 	}
@@ -142,6 +142,11 @@ public class Player extends DynamicObject{
 	void dropPoint(World currentworld, String texturelocation , float scale, float w, float h){
 		Trace trace = new Trace(currentworld, texturelocation, scale, this.getBodyVector2().x,this.getBodyVector2().y, w*2/scale,h*2/scale,this);
 		contacts.add(trace);
+	}
+	
+	void increaseScore(float score){
+		if (this.ID==0) DFVR.serverPoint+=score;
+		else DFVR.clientPoint+=score;
 	}
 
 }

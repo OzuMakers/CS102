@@ -1,11 +1,8 @@
 package com.cs102.game;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 
 import com.cs102.networkpacks.*;
@@ -97,35 +94,4 @@ public class ClientProgram extends Listener implements Runnable{
 		Left pd = new Left();
 		client.sendTCP(pd);
 	}
-	
-	/*static Network network = new Network();
-	
-	public static void update(){
-			NetPack pd = new NetPack();
-			pd.OppPlayerX = DFVR.player.getBodyVector2().x;
-			pd.OppPlayerX = DFVR.player.getBodyVector2().y;	
-			System.out.println("Network Update Sent");
-			network.client.sendTCP(pd);
-			
-//			player.networkPosition.y = player.position.y;
-		}
-	
-	@Override
-	public void run() {
-		network.connect();
-		
-		this.getKryo().register(NetPack.class);
-		
-		while(true){
-		update();
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		}
-	}
-	
-	*/
 }

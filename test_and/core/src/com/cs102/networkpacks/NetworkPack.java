@@ -10,8 +10,8 @@ private float serverY=0;
 private float clientX=0;
 private float clientY=0;
 private int gamestate;
-private int serverPoint;
-private int clientPoint;
+private float serverPoint;
+private float clientPoint;
 private Stack<Trace> traceStackServer;
 private Stack<Trace> traceStackClient;
 
@@ -61,17 +61,17 @@ public int getGamestate() {
 public void setGamestate(int gamestate) {
 	this.gamestate = gamestate;
 }
-public int getServerPoint() {
+public float getServerPoint() {
 	return serverPoint;
 }
-public void setServerPoint(int serverPoint) {
+public void setServerPoint(float serverPoint) {
 	this.serverPoint = serverPoint;
 }
-public int getClientPoint() {
+public float getClientPoint() {
 	return clientPoint;
 }
-public void setClientPoint(int clientPoint) {
-	this.clientPoint = clientPoint;
+public void setClientPoint(float clientPoint2) {
+	this.clientPoint = clientPoint2;
 }
 
 }
