@@ -59,7 +59,6 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import com.cs102.game.ServerProgram;
-import com.cs102.screens.Splash;
 
 public class DFVR extends Game implements InputProcessor {
 
