@@ -50,7 +50,8 @@ public class Trace extends StaticObject{
 		return bodyEdgeScreen;
 	}
 	public void Draw(SpriteBatch batch){
-		batch.draw(sprite, initx*scale, inity*scale,
-				sprite.getOriginY(),
-				sprite.getWidth());}
+		//sprite.draw(batch);
+		batch.draw(sprite, initx*scale-sprite.getWidth()/2, inity*scale-sprite.getHeight()/2,
+				sprite.getWidth(),
+				sprite.getHeight());}
 }

@@ -1,10 +1,9 @@
 /*Changelog:
- *[ADDED] RANDOM SPAWN BONUS
- *[ADDED] BOUNCING SOUND
+ *[ADDED] ICE WINNING SOUND
+ *[FIXED] TRACE SIZE&LOCATION
  */
 /*NEXT:
  * ARRANGING HUDS
- * ICE WINNING SOUND
  */
 		
 			/*font.draw(batch,
@@ -83,7 +82,7 @@ public class DFVR extends Game implements InputProcessor {
 	public static MagicBolt magicbolt;
     Box2DDebugRenderer debugRenderer;
     Matrix4 debugMatrix;
-    static int gamestate=-1;
+    static int gamestate=-1; //MUST BE -1
     public static int serverPoint=0;
     public static int clientPoint=0;
     public static final float playerW=100;
@@ -104,7 +103,9 @@ public class DFVR extends Game implements InputProcessor {
      * ClientPlayer ID: 1
      */
     //Config B.
-    static float goalsizepx=300;
+    public static float goalsizepx=300;
+    public static int diesizepx=30;
+    public static int winningCriteria=10;
   //Config E.
     
     boolean relocate=false;
@@ -237,8 +238,8 @@ public class DFVR extends Game implements InputProcessor {
 			dropped=true;
 			player.dropPoint(world,"line_burn.png", 100, 50,50);
 			opp.dropPoint(world,"line_ice.png", 100, 50,50);
-			if (player.contacts.size()>50) {world.destroyBody(player.contacts.get(0).getBody()); player.contacts.remove(0);}
-			if (opp.contacts.size()>50) {world.destroyBody(opp.contacts.get(0).getBody()); opp.contacts.remove(0);}
+			if (player.contacts.size()>30) {world.destroyBody(player.contacts.get(0).getBody()); player.contacts.remove(0);}
+			if (opp.contacts.size()>30) {world.destroyBody(opp.contacts.get(0).getBody()); opp.contacts.remove(0);}
 		float delay = (float) 0.03; // seconds
 
 		Timer.schedule(new Task(){
@@ -275,12 +276,14 @@ public class DFVR extends Game implements InputProcessor {
 	@Override
 	public void render() {
 		clearScreen();
-		
+		if (serverPoint>=winningCriteria) gamestate=7;
+		else if (clientPoint>=winningCriteria) gamestate=8;
 		if (gamestate==0 && !gamestarted) {(new Thread(new ServerProgram())).start(); gamestarted=true; gamestate=2;}
 		else if(gamestate==1 && !gamestarted) {(new Thread(new ClientProgram())).start(); gamestarted=true; gamestate=2;}
-		if (gamestate==4){serverPoint+=1; initializePlayers(); gamestate=2; Sound sound = Gdx.audio.newSound(Gdx.files.internal("FireBall.mp3"));
-    	sound.play(1.0f);}
-		else if (gamestate==5){clientPoint+=1; initializePlayers(); gamestate=2;}
+		if (gamestate==4){serverPoint+=1; initializePlayers(); gamestate=2;Sound sound = Gdx.audio.newSound(Gdx.files.internal("breakin_ice.mp3"));
+    	sound.play(10.0f);}
+		else if (gamestate==5){clientPoint+=1; initializePlayers(); gamestate=2;Sound sound = Gdx.audio.newSound(Gdx.files.internal("FireBall.mp3"));
+    	sound.play(2.0f);}
 		else if (gamestate==6){clientPoint-=1; serverPoint-=1; initializePlayers(); gamestate=2;}
 		if (gamestate==2) removeBodies(world);
 		//Player Movements&Trace B.
@@ -333,12 +336,16 @@ public class DFVR extends Game implements InputProcessor {
 	
 private void renderHUDs(){
 	font.draw(batch,
-			"Iceball: " + clientPoint + " Fireball: "+ serverPoint, -Gdx.graphics.getWidth() / 4-150,
-			Gdx.graphics.getHeight() / 4+50);
-if (gamestate==3)	font.draw(batch,
+			"Iceball: " + clientPoint + " Fireball: "+ serverPoint, -Gdx.graphics.getWidth()/2+5,
+			+Gdx.graphics.getHeight()/2-5);
+if (gamestate==7){font.setColor(Color.RED); font.draw(batch,
+		"FIREBALL WIN!", -60,0);font.setColor(Color.BLACK);}
+else if (gamestate==8){font.setColor(Color.BLUE); font.draw(batch,
+		"ICEBALL WIN!", -55,0);font.setColor(Color.BLACK);}
+else if (gamestate==3)	{font.draw(batch,
 			"PAUSED", -Gdx.graphics.getWidth() / 4,
-		Gdx.graphics.getHeight() / 4-50);
-if (gamestate==-1)	font.draw(batch,
+		Gdx.graphics.getHeight() / 4-50);}
+else if (gamestate==-1)	font.draw(batch,
 		"Server: Press 'V' Client: Press 'C'", -Gdx.graphics.getWidth() / 4-150,
 		Gdx.graphics.getHeight() / 4+75);
 	/*if (control==1) font.draw(batch,
@@ -384,7 +391,7 @@ Gdx.graphics.getHeight() / 4+125);
 		if (keycode == Input.Keys.W) DFVR.opp.setMove("Up");	
 		if (keycode == Input.Keys.S) DFVR.opp.setMove("Down");	
 		
-		if (keycode == Input.Keys.P) {if (gamestate>2) gamestate=2; else gamestate=3;}
+		if (keycode == Input.Keys.P) {if (gamestate>2) gamestate=2; else if(gamestate==2) gamestate=3;}
 		if (keycode == Input.Keys.V) {if (gamestate==-1) gamestate=0;}
 		if (keycode == Input.Keys.C) {if (gamestate==-1) gamestate=1;}
 		}
@@ -393,7 +400,7 @@ Gdx.graphics.getHeight() / 4+125);
 		if (keycode == Input.Keys.LEFT)ClientProgram.SendLeft();
 		if (keycode == Input.Keys.UP) ClientProgram.SendUp();
 		if (keycode == Input.Keys.DOWN) ClientProgram.SendDown();
-		if (keycode == Input.Keys.P) {if (gamestate>2) gamestate=2; else gamestate=3;}
+		if (keycode == Input.Keys.P) {if (gamestate>2) gamestate=2; else if(gamestate==2) gamestate=3;}
 		if (keycode == Input.Keys.V) {if (gamestate==-1) gamestate=0;}
 		if (keycode == Input.Keys.C) {if (gamestate==-1) gamestate=1;}
 		

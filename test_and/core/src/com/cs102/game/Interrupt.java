@@ -15,17 +15,13 @@ private static float delay = (float) 0.1; // seconds
 	
 public void getAction(){
 	if (!locked){
-		//CALL FUNCS
-		System.out.println(locked);
 	DFVR.player.getSmaller((float)1, 1,100);
 	DFVR.opp.getSmaller((float)1, 1,100);
 		locked=true;
-		System.out.println(locked);
 	Timer.schedule(new Task(){
 	    @Override
 	    public void run() {
 	    locked=false;
-	    System.out.println(locked);
 	    }
 	}, delay);
 }

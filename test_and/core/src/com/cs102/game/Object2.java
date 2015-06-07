@@ -40,9 +40,7 @@ public class Object2 {
 	 }
 	 
 	 public void setSpriteSize(float w, float h){
-		 System.out.println("Current Width: "+this.GetSprite().getWidth()+"Current Height"+this.GetSprite().getHeight());
 		 sprite.setSize(w,h);
-		 System.out.println("New Width: "+this.GetSprite().getWidth()+"New Height"+this.GetSprite().getHeight());
 		 
 	 }
 		

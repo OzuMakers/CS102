@@ -55,7 +55,7 @@ public class Player extends DynamicObject{
 	}
 	
 	void getSmaller(float howmuchw, float howmuchh, float scale){
-		if (this.GetSprite().getWidth()<0 || this.GetSprite().getHeight()<0) {
+		if (this.GetSprite().getWidth()<DFVR.diesizepx || this.GetSprite().getHeight()<DFVR.diesizepx) {
 			if (this.ID==0) DFVR.gamestate=5; else DFVR.gamestate=4;}
 		if (DFVR.gamestate==2){
 		this.setSpriteSize(this.GetSprite().getWidth()-howmuchw, this.GetSprite().getHeight()-howmuchh);
