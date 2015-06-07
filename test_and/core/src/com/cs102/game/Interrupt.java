@@ -18,7 +18,7 @@ public void getAction(){
 		//CALL FUNCS
 		System.out.println(locked);
 	DFVR.player.getSmaller((float)1, 1,100);
-		//DFVR.opp.getSmaller();
+	DFVR.opp.getSmaller((float)1, 1,100);
 		locked=true;
 		System.out.println(locked);
 	Timer.schedule(new Task(){

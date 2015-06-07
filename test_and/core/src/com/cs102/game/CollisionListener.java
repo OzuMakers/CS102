@@ -32,9 +32,7 @@ public class CollisionListener implements ContactListener{
 		       if (fa.getBody().getUserData() instanceof Trace && (fb.getBody().getUserData() instanceof Player)){
 		        	if (((Trace)fa.getBody().getUserData()).owner != fb.getBody().getUserData()&&  DFVR.gamestate==2) {
 		        	if (((Player) fb.getBody().getUserData()).ID==0){ DFVR.gamestate=5;
-		        	System.out.println("ICEBALL WON");
-		        	Sound sound = Gdx.audio.newSound(Gdx.files.internal("FireBall.mp3"));
-		        	sound.play(1.0f);}
+		        	System.out.println("ICEBALL WON");}
 		        	else { DFVR.gamestate=4;
 		        	System.out.println("Server WON");}
 		        	} }
@@ -47,6 +45,18 @@ public class CollisionListener implements ContactListener{
 			        	System.out.println("Server WON");
 			        	DFVR.serverPoint+=1;}
 		        	} }
+		        else  if ((fa.getBody().getUserData() instanceof MagicBolt) && (fb.getBody().getUserData() instanceof Player)){
+		        	((MagicBolt)fb.getBody().getUserData()).addToSensitiveList();
+		        	((MagicBolt)fb.getBody().getUserData()).makeBigger(((Player)fa.getBody().getUserData()), DFVR.howmuchbiggerpx, DFVR.howmuchbiggerpx, 100);
+		        } 
+		        else  if ((fb.getBody().getUserData() instanceof MagicBolt) && (fa.getBody().getUserData() instanceof Player)){
+		        	((MagicBolt)fb.getBody().getUserData()).addToSensitiveList();
+		        	((MagicBolt)fb.getBody().getUserData()).makeBigger(((Player)fa.getBody().getUserData()), DFVR.howmuchbiggerpx, DFVR.howmuchbiggerpx, 100);
+		        	}
+		        else  if ((fb.getBody().getUserData() instanceof LineWall) || (fa.getBody().getUserData() instanceof LineWall)){
+		        	Sound sound = Gdx.audio.newSound(Gdx.files.internal("ball_bounce.mp3"));
+		        	sound.play(2.0f);
+		        	}
 		    }
 		}
    

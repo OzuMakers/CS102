@@ -21,6 +21,10 @@ public class Object2 {
 		sprite.setPosition(-sprite.getWidth() / 2, -sprite.getHeight() / 2);
 		 }
 	 
+	 void CenterSprite(){
+			sprite.setPosition(-sprite.getWidth() / 2, -sprite.getHeight() / 2);
+			 }
+	 
 	 void SetImage(String spr, float x, float y){
 		img = new Texture(spr);
 		sprite = new Sprite(img);

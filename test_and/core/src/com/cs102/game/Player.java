@@ -37,8 +37,6 @@ public class Player extends DynamicObject{
 		body = currentworld.createBody(this.GetBodyDef());
 		body.setUserData(this);
 		CircleShape cshape = new CircleShape();
-		
-		this.setSpriteSize(50, 50);
 		cshape.setRadius((this.GetSprite().getWidth() / 2) / scale);
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = cshape;

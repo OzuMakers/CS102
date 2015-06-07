@@ -1,13 +1,11 @@
 /*Changelog:
- * [ADDED] Random Spawn
- * [ADDED] SCORE HUDS
- * [ADDED] SOUNDS
- * [ADDED] Getting Smaller
+ *[ADDED] RANDOM SPAWN BONUS
+ *[ADDED] BOUNCING SOUND
  */
-
-//ADD LIMITED RESOURCE
-//COLLECT OR BE SMALLER
-
+/*NEXT:
+ * ARRANGING HUDS
+ * ICE WINNING SOUND
+ */
 		
 			/*font.draw(batch,
 				"Restitution: " + body.getFixtureList().first().getRestitution(), -Gdx.graphics.getWidth() / 2,
@@ -37,6 +35,7 @@
 package com.cs102.game;
 
 import java.util.Random;
+import java.util.Stack;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.ApplicationAdapter;
@@ -71,14 +70,17 @@ public class DFVR extends Game implements InputProcessor {
 	public static boolean isServer=true;
 	public boolean gamestarted=false;
 	private boolean stopRendering=false;
-	
+	public final static float howmuchbiggerpx=50;
 	SpriteBatch batch;
 	public  static World world;
-
+	
+	public static Stack<Object2> WorldSensitiveActions = new Stack<Object2>();
+	
 	LineWall[] wallArray = new LineWall[4];
 	Object2[] objectArray = new Object2[1];
 	public static Player player;
 	public static Player opp;
+	public static MagicBolt magicbolt;
     Box2DDebugRenderer debugRenderer;
     Matrix4 debugMatrix;
     static int gamestate=-1;
@@ -101,6 +103,11 @@ public class DFVR extends Game implements InputProcessor {
      * ServerPlayer ID: 0
      * ClientPlayer ID: 1
      */
+    //Config B.
+    static float goalsizepx=300;
+  //Config E.
+    
+    boolean relocate=false;
     
 	OrthographicCamera camera;
 	BitmapFont font;
@@ -115,8 +122,8 @@ public class DFVR extends Game implements InputProcessor {
 	int platform=0;
 	static int control=0;
 	static boolean dropped=false;
-	float scaledwidth = WIDTH/100;
-	float scaledheight = HEIGHT/100;
+	static float scaledwidth = WIDTH/100;
+	static float scaledheight = HEIGHT/100;
 	/* 0: Desktop
 	 * 1: Android
 	*/
@@ -147,6 +154,7 @@ public class DFVR extends Game implements InputProcessor {
 		
 		//Object B.
 		objectArray[0] = new Object2("background.png",0,0);
+		
 		//Object E.
 		
 		//StaticObject B.
@@ -161,6 +169,8 @@ public class DFVR extends Game implements InputProcessor {
 		player = new Player(world, "initial_player.jpg", 100, new Animation(1/10f, atlas.getRegions()), 0,0,0);
 		atlas = new TextureAtlas(Gdx.files.internal("iceballanim.atlas"));
 		opp = new Player(world, "initial_player.jpg", 100, new Animation(1/10f, atlas.getRegions()), 100, 100, 1);
+		atlas = new TextureAtlas(Gdx.files.internal("magicbolt.atlas"));
+		magicbolt= new MagicBolt(world,"initial_player.jpg",100,new Animation(1/10f, atlas.getRegions()), 50,50);
 		//DynamicObject E.
 		
 		
@@ -254,14 +264,25 @@ public class DFVR extends Game implements InputProcessor {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	}
 	
+	private void removeBodies(World currentworld){
+		while(!WorldSensitiveActions.isEmpty()){
+			Object2 currentobject= WorldSensitiveActions.pop();
+			if (currentobject instanceof MagicBolt)
+			((MagicBolt)currentobject).reLocate();
+		}
+	}
+	
 	@Override
 	public void render() {
 		clearScreen();
+		
 		if (gamestate==0 && !gamestarted) {(new Thread(new ServerProgram())).start(); gamestarted=true; gamestate=2;}
 		else if(gamestate==1 && !gamestarted) {(new Thread(new ClientProgram())).start(); gamestarted=true; gamestate=2;}
-		if (gamestate==4){serverPoint+=1; initializePlayers(); gamestate=2;}
+		if (gamestate==4){serverPoint+=1; initializePlayers(); gamestate=2; Sound sound = Gdx.audio.newSound(Gdx.files.internal("FireBall.mp3"));
+    	sound.play(1.0f);}
 		else if (gamestate==5){clientPoint+=1; initializePlayers(); gamestate=2;}
 		else if (gamestate==6){clientPoint-=1; serverPoint-=1; initializePlayers(); gamestate=2;}
+		if (gamestate==2) removeBodies(world);
 		//Player Movements&Trace B.
 		if(gamestate==2)updateMovement(); //If inAction
 		//Player Movements&Trace E.
@@ -284,7 +305,6 @@ public class DFVR extends Game implements InputProcessor {
 			
 			if (platform==1) Gdx.gl.glViewport( Gdx.graphics.getWidth()/2,0,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight() );
 			batch.begin();
-			renderHUDs();
 			if(gamestate==2){ //If inAction
 				timePassed += Gdx.graphics.getDeltaTime();
 				renderAction(batch,timePassed);
@@ -292,7 +312,7 @@ public class DFVR extends Game implements InputProcessor {
 			renderHUDs();
 			batch.end();	
 		
-	debugRenderer.render(world, debugMatrix);
+//	debugRenderer.render(world, debugMatrix);
 		
 	}
 
@@ -305,8 +325,10 @@ public class DFVR extends Game implements InputProcessor {
 	
 	private void renderAction(SpriteBatch batch, float timePassed){
 		objectArray[0].Draw(batch); //RENDER BACKGROUND
+		objectArray[0].CenterSprite();//Center the background
 		player.Draw(batch,timePassed); //RENDER SERVER PLAYER
 		opp.Draw(batch,timePassed); //RENDER CLIENT PLAYER
+		magicbolt.Draw(batch, timePassed);
 	}
 	
 private void renderHUDs(){
@@ -318,7 +340,7 @@ if (gamestate==3)	font.draw(batch,
 		Gdx.graphics.getHeight() / 4-50);
 if (gamestate==-1)	font.draw(batch,
 		"Server: Press 'V' Client: Press 'C'", -Gdx.graphics.getWidth() / 4-150,
-		Gdx.graphics.getHeight() / 4+50);
+		Gdx.graphics.getHeight() / 4+75);
 	/*if (control==1) font.draw(batch,
 	"Platform: "+platform, -Gdx.graphics.getWidth() / 2,
 Gdx.graphics.getHeight() / 2);

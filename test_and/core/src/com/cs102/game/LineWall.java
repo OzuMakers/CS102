@@ -21,6 +21,7 @@ public class LineWall extends StaticObject{
 	        
 	        bodyEdgeScreen = currentworld.createBody(this.GetBodyDef());
 	        bodyEdgeScreen.createFixture(fixtureDef2);
+	        bodyEdgeScreen.setUserData(this);
 	        edgeShape.dispose();
 	}
 }
